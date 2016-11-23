@@ -18,6 +18,13 @@
       <Version>1.0.0-alpha-20161104-2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="RavenDB.Client">
+      <Version>3.5.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Xemio.Shared\Xemio.Shared.csproj" />
+    <ProjectReference Include="..\Xemio.Server.Contracts\Xemio.Server.Contracts.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

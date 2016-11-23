@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Xemio.Server.Infrastructure.Controllers
 {
-    [Route("api/debug")]
+    [Route("debug")]
     public class DebugController : ControllerBase
     {
         [HttpGet]

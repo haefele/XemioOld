@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using Xemio.Hosts.AspNetCore.Setup;
 
 namespace Xemio.Hosts.AspNetCore
 {
@@ -17,7 +18,7 @@ namespace Xemio.Hosts.AspNetCore
         {
             this.Configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange:true)
                 .AddEnvironmentVariables()
                 .Build();
         }
@@ -27,6 +28,8 @@ namespace Xemio.Hosts.AspNetCore
         {
             services.AddCors();
             services.AddMvc();
+            services.AddLogging();
+            services.AddRaven(this.Configuration.GetSection("Raven"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,16 +39,7 @@ namespace Xemio.Hosts.AspNetCore
             loggerFactory.AddDebug();
 
             app.UseCors(f => f.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidIssuer = $"https://{this.Configuration["auth0:domain"]}/",
-                    ValidAudience = this.Configuration["auth0:clientid"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(this.Configuration["auth0:clientsecret"].Replace("_", "/").Replace("-", "+"))),
-                    NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                }
-            });
+            app.UseAuth0Authentication(this.Configuration.GetSection("Auth0"));
             app.UseMvc();
         }
     }
