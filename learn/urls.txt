@@ -1,0 +1,17 @@
+Model Validation:
+https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation
+
+Custom Model Validation:
+https://docs.microsoft.com/en-us/aspnet/core/mvc/models/validation#custom-validation
+
+Logging:
+http://stackoverflow.com/questions/30194919/how-to-register-ilogger-for-injection-in-asp-net-mvc-6
+
+API Versioning:
+https://github.com/Microsoft/aspnet-api-versioning
+
+Test JWT:
+https://jwt.io/
+
+Auth0 UWP Library:
+https://github.com/auth0/Auth0.Windows.UWP
