@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.25914.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{140948E9-135B-4094-ADFA-3FBCAABFF042}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Shared", "Shared\Xemio.Shared\Xemio.Shared.csproj", "{524EC1E1-3949-47A2-AB69-2A125660E06B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8E240DA3-0DAE-470E-B6DD-3222B1A1250E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Contracts", "Server\Xemio.Server.Contracts\Xemio.Server.Contracts.csproj", "{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Infrastructure", "Server\Xemio.Server.Infrastructure\Xemio.Server.Infrastructure.csproj", "{448324E3-08B4-4BEA-9269-0A878B66DA73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{A3217A47-262E-4E17-B4D2-0D0F75B29676}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Hosts.AspNetCore", "Hosts\Xemio.Hosts.AspNetCore\Xemio.Hosts.AspNetCore.csproj", "{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{524EC1E1-3949-47A2-AB69-2A125660E06B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524EC1E1-3949-47A2-AB69-2A125660E06B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524EC1E1-3949-47A2-AB69-2A125660E06B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524EC1E1-3949-47A2-AB69-2A125660E06B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{448324E3-08B4-4BEA-9269-0A878B66DA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{448324E3-08B4-4BEA-9269-0A878B66DA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{448324E3-08B4-4BEA-9269-0A878B66DA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{448324E3-08B4-4BEA-9269-0A878B66DA73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{524EC1E1-3949-47A2-AB69-2A125660E06B} = {140948E9-135B-4094-ADFA-3FBCAABFF042}
+		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9} = {8E240DA3-0DAE-470E-B6DD-3222B1A1250E}
+		{448324E3-08B4-4BEA-9269-0A878B66DA73} = {8E240DA3-0DAE-470E-B6DD-3222B1A1250E}
+		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF} = {A3217A47-262E-4E17-B4D2-0D0F75B29676}
+	EndGlobalSection
+EndGlobal
