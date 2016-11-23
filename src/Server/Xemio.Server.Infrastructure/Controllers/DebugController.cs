@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Xemio.Server.Infrastructure.Controllers
 {
@@ -6,6 +7,7 @@ namespace Xemio.Server.Infrastructure.Controllers
     public class DebugController : ControllerBase
     {
         [HttpGet]
+        [Authorize]
         public string Get()
         {
             return "Hoi";

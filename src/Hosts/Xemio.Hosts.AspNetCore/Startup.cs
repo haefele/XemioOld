@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace Xemio.Hosts.AspNetCore
 {
@@ -22,6 +25,7 @@ namespace Xemio.Hosts.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc();
         }
 
@@ -31,6 +35,17 @@ namespace Xemio.Hosts.AspNetCore
             loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseCors(f => f.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            app.UseJwtBearerAuthentication(new JwtBearerOptions
+            {
+                TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = $"https://{this.Configuration["auth0:domain"]}/",
+                    ValidAudience = this.Configuration["auth0:clientid"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(this.Configuration["auth0:clientsecret"].Replace("_", "/").Replace("-", "+"))),
+                    NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+                }
+            });
             app.UseMvc();
         }
     }
