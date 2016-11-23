@@ -1,0 +1,117 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Xemio",
+		"_postman_id": "8654f081-d140-fca2-db34-3e827d089da8",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Notes/Folders",
+			"description": "",
+			"item": [
+				{
+					"name": "create folder",
+					"request": {
+						"url": "http://localhost:9000/notes/folders",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hhZWZlbGUuZXUuYXV0aDAuY29tLyIsInN1YiI6IndpbmRvd3NsaXZlfDI0ZDc3NmU0OWNmYjcxMDgiLCJhdWQiOiJUdFB6SENrMlE0NjgzTWZNMEVDeEhkd0EyNjRjSDI4cyIsImV4cCI6MTQ3OTk2ODE1MCwiaWF0IjoxNDc5OTMyMTUwfQ.KtOvGRM-C7gQcggkB1kT-YkSsCm_1Dc9Sw6UHuXvFV0",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Test2\",\n\t\"parentFolderId\":\"0e9aaa0b-606f-4df4-91db-76b0102c2ed1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all root folders",
+					"request": {
+						"url": "http://localhost:9000/notes/folders",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hhZWZlbGUuZXUuYXV0aDAuY29tLyIsInN1YiI6IndpbmRvd3NsaXZlfDI0ZDc3NmU0OWNmYjcxMDgiLCJhdWQiOiJUdFB6SENrMlE0NjgzTWZNMEVDeEhkd0EyNjRjSDI4cyIsImV4cCI6MTQ3OTk2ODE1MCwiaWF0IjoxNDc5OTMyMTUwfQ.KtOvGRM-C7gQcggkB1kT-YkSsCm_1Dc9Sw6UHuXvFV0",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get all sub folders",
+					"request": {
+						"url": "http://localhost:9000/notes/folders?folderId=0e9aaa0b-606f-4df4-91db-76b0102c2ed1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hhZWZlbGUuZXUuYXV0aDAuY29tLyIsInN1YiI6IndpbmRvd3NsaXZlfDI0ZDc3NmU0OWNmYjcxMDgiLCJhdWQiOiJUdFB6SENrMlE0NjgzTWZNMEVDeEhkd0EyNjRjSDI4cyIsImV4cCI6MTQ3OTk2ODE1MCwiaWF0IjoxNDc5OTMyMTUwfQ.KtOvGRM-C7gQcggkB1kT-YkSsCm_1Dc9Sw6UHuXvFV0",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get specific folder",
+					"request": {
+						"url": "http://localhost:9000/notes/folders/0e9aaa0b-606f-4df4-91db-76b0102c2ed1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hhZWZlbGUuZXUuYXV0aDAuY29tLyIsInN1YiI6IndpbmRvd3NsaXZlfDI0ZDc3NmU0OWNmYjcxMDgiLCJhdWQiOiJUdFB6SENrMlE0NjgzTWZNMEVDeEhkd0EyNjRjSDI4cyIsImV4cCI6MTQ3OTk2ODE1MCwiaWF0IjoxNDc5OTMyMTUwfQ.KtOvGRM-C7gQcggkB1kT-YkSsCm_1Dc9Sw6UHuXvFV0",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\":\"Test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
