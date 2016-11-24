@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Xemio.Hosts.AspNetCore.Setup;
+using Xemio.Server.Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace Xemio.Hosts.AspNetCore
 {
@@ -26,18 +28,17 @@ namespace Xemio.Hosts.AspNetCore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDatabase(this.Configuration.GetSection("Database"));
             services.AddCors();
             services.AddMvc();
             services.AddLogging();
-            services.AddRaven(this.Configuration.GetSection("Raven"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
-            loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
+            app.MigrateDatabase();
+            app.UseLogging(this.Configuration.GetSection("Logging"));
             app.UseCors(f => f.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseAuth0Authentication(this.Configuration.GetSection("Auth0"));
             app.UseMvc();

@@ -1,68 +1,103 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using EnsureThat;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using Raven.Client;
-using Raven.Client.Linq;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
+using Xemio.Server.Infrastructure.Database;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Controllers.Notes
 {
+    [Authorize]
     [Route("notes/folders")]
     public class FoldersController : ControllerBase
     {
-        private readonly IDocumentStore _documentStore;
+        private readonly XemioContext _xemioContext;
 
-        public FoldersController(IDocumentStore documentStore)
+        public FoldersController(XemioContext xemioContext)
         {
-            this._documentStore = documentStore;
+            EnsureArg.IsNotNull(xemioContext, nameof(xemioContext));
+
+            this._xemioContext = xemioContext;
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetFolders(Guid? folderId = null)
+        {
+            var folders = await this._xemioContext.Folders
+                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folderId)
+                .ToListAsync();
+
+            return Ok(folders);
         }
 
-        [HttpGet]
-        [Authorize]
-        public async Task<IList<Folder>> GetFolders(Guid? folderId = null)
+        [HttpGet("{folderId}", Name = nameof(GetFolder))]
+        public async Task<IActionResult> GetFolder(Guid folderId)
         {
-            using (var session = this._documentStore.OpenAsyncSession())
-            {
-                return await session.Query<Folder>()
-                    .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folderId)
-                    .ToListAsync();
-            }
-        }
+            EnsureArg.IsNotEmpty(folderId, nameof(folderId));
 
-        [HttpGet]
-        [Authorize]
-        [Route("{folderId}")]
-        public async Task<Folder> GetFolder(Guid folderId)
-        {
-            using (var session = this._documentStore.OpenAsyncSession())
-            {
-                return await session.LoadAsync<Folder>(folderId);
-            }
+            var folder = await this._xemioContext.FindAsync<Folder>(folderId);
+
+            if (folder == null)
+                return NotFound();
+
+            return Ok(folder);
         }
         
         [HttpPost]
-        [Authorize]
-        public async Task<Folder> PostFolder([FromBody]CreateFolder data)
+        public async Task<IActionResult> PostFolder([FromBody]CreateFolder data)
         {
-            using (var session = this._documentStore.OpenAsyncSession())
+            EnsureArg.IsNotNull(data, nameof(data));
+
+            var folder = new Folder
             {
-                session.Advanced.WaitForIndexesAfterSaveChanges();
+                Name = data.Name,
+                ParentFolderId = data.ParentFolderId,
+                UserId = this.User.Identity.Name
+            };
 
-                var folder = new Folder
+            await this._xemioContext.AddAsync(folder);
+            await this._xemioContext.SaveChangesAsync();
+
+            return Created(this.Url.Link(nameof(GetFolder), new { folderId = folder.Id }), folder);
+        }
+
+        [HttpDelete("{folderId}")]
+        public async Task<IActionResult> DeleteFolder(Guid folderId, [FromQuery]byte[] etag = null)
+        {
+            EnsureArg.IsNotEmpty(folderId, nameof(folderId));
+
+            try
+            {
+                Folder folder = await this._xemioContext.FindAsync<Folder>(folderId);
+
+                if (folder == null)
+                    return NotFound();
+
+                if (etag != null)
+                    this._xemioContext.ETagForConcurrencyControlIs(folder, etag);
+
+                List<Folder> subFolders = await this._xemioContext.Folders
+                    .Where(f => f.ParentFolderId == folderId)
+                    .ToListAsync();
+            
+                foreach (var subFolder in subFolders)
                 {
-                    Name = data.Name,
-                    ParentFolderId = data.ParentFolderId,
-                    UserId = this.User.Identity.Name
-                };
+                    subFolder.ParentFolderId = null;
+                }
 
-                await session.StoreAsync(folder);
-                await session.SaveChangesAsync();
+                this._xemioContext.Remove(folder);
 
-                return folder;
+                await this._xemioContext.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return base.BadRequest("The folder was modified in the meantime.");
             }
         }
     }

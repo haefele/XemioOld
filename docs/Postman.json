@@ -30,7 +30,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\":\"Test2\",\n\t\"parentFolderId\":\"0e9aaa0b-606f-4df4-91db-76b0102c2ed1\"\n}"
+							"raw": "{\n\t\"name\":\"Test\",\n\t\"parentFolderId\":null\n}"
 						},
 						"description": ""
 					},
@@ -106,6 +106,26 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"name\":\"Test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "delete specific folder",
+					"request": {
+						"url": "http://localhost:9000/notes/folders/1442870d-a366-4a67-a9a1-08d414a9d32c",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2hhZWZlbGUuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDU4MzE4YTFiOWNhNjY2YzY2Yzk2ZDJjNiIsImF1ZCI6IlR0UHpIQ2syUTQ2ODNNZk0wRUN4SGR3QTI2NGNIMjhzIiwiZXhwIjoxNDgwMDU1NDk1LCJpYXQiOjE0ODAwMTk0OTV9.LFHWMHE70S5c20fJ94iSylP89tPsI_uuvZnE8IYu39E",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
 						},
 						"description": ""
 					},
