@@ -1,0 +1,29 @@
+CREATE TRIGGER [dbo].[tri_FolderDelete] ON [dbo].[Folders]
+INSTEAD OF DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    WITH foldersToDelete AS (
+        SELECT  folder_id, CAST(1 AS INT) AS folderLevel
+        FROM    dbo.Folders
+        WHERE   folder_id IN (SELECT folder_id FROM deleted)
+        UNION ALL
+        SELECT  e.folder_id, etd.folderLevel + 1
+        FROM    dbo.Folders e
+                JOIN foldersToDelete etd ON e.parent_folder_id = etd.folder_id AND e.parent_folder_id != e.folder_id
+    )
+    SELECT folder_id, folderLevel
+    INTO #folderTable
+    FROM foldersToDelete;
+    DECLARE folderCursor CURSOR FOR SELECT folder_id FROM #folderTable ORDER BY folderLevel DESC;
+    DECLARE @folder_id INT;
+    OPEN folderCursor;
+    FETCH NEXT FROM folderCursor INTO @folder_id
+    WHILE @@FETCH_STATUS = 0 BEGIN
+        DELETE FROM dbo.Folders
+        WHERE folder_id = @folder_id;
+        FETCH NEXT FROM folderCursor INTO @folder_id;
+    END;
+    CLOSE folderCursor;
+END;
