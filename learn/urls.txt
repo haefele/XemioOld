@@ -15,3 +15,6 @@ https://jwt.io/
 
 Auth0 UWP Library:
 https://github.com/auth0/Auth0.Windows.UWP
+
+Localization:
+https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization
