@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Database
@@ -27,10 +26,5 @@ namespace Xemio.Server.Infrastructure.Database
         }
 
         public DbSet<Folder> Folders { get; set; }
-
-        public void ETagForConcurrencyControlIs(IConcurrencyControlledEntity entity, byte[] etag)
-        {
-            this.Entry(entity).OriginalValues[nameof(IConcurrencyControlledEntity.ETag)] = etag;
-        }
     }
 }
