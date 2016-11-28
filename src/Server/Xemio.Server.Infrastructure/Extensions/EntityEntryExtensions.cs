@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Xemio.Server.Infrastructure.Entites;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Extensions

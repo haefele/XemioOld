@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xemio.Server.Infrastructure.Database;
+using Xemio.Server.Infrastructure.Entites.Notes;
 using Xemio.Server.Infrastructure.Extensions;
 using Xemio.Shared.Models.Notes;
 
@@ -38,7 +39,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         public async Task<IActionResult> GetFolders(Guid? folderId = null)
         {
             var folders = await this._xemioContext.Folders
-                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folderId)
+                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolder.Id == folderId)
                 .ToListAsync();
 
             return this.Ok(folders);
@@ -65,7 +66,9 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             var folder = new Folder
             {
                 Name = data.Name,
-                ParentFolderId = data.ParentFolderId,
+                ParentFolder = data.ParentFolderId != null 
+                    ? await this._xemioContext.FindAsync<Folder>(data.ParentFolderId) 
+                    : null,
                 UserId = this.User.Identity.Name
             };
 
@@ -89,16 +92,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
                 if (etag != null)
                     this._xemioContext.Entry(folder).ETagForConcurrencyControlIs(etag);
-
-                List<Folder> subFolders = await this._xemioContext.Folders
-                    .Where(f => f.ParentFolderId == folderId)
-                    .ToListAsync();
-            
-                foreach (var subFolder in subFolders)
-                {
-                    subFolder.ParentFolderId = null;
-                }
-
+                
                 this._xemioContext.Remove(folder);
 
                 await this._xemioContext.SaveChangesAsync();

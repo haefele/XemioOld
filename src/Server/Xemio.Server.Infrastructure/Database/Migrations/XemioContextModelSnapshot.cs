@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Xemio.Server.Infrastructure.Database;
 
-namespace Xemio.Server.Infrastructure.Migrations
+namespace Xemio.Server.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(XemioContext))]
     partial class XemioContextModelSnapshot : ModelSnapshot
@@ -16,7 +16,7 @@ namespace Xemio.Server.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Xemio.Shared.Models.Notes.Folder", b =>
+            modelBuilder.Entity("Xemio.Server.Infrastructure.Entites.Notes.Folder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -41,10 +41,10 @@ namespace Xemio.Server.Infrastructure.Migrations
                     b.ToTable("Folders");
                 });
 
-            modelBuilder.Entity("Xemio.Shared.Models.Notes.Folder", b =>
+            modelBuilder.Entity("Xemio.Server.Infrastructure.Entites.Notes.Folder", b =>
                 {
-                    b.HasOne("Xemio.Shared.Models.Notes.Folder")
-                        .WithMany()
+                    b.HasOne("Xemio.Server.Infrastructure.Entites.Notes.Folder", "ParentFolder")
+                        .WithMany("SubFolders")
                         .HasForeignKey("ParentFolderId");
                 });
         }

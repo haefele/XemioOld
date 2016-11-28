@@ -1,4 +1,4 @@
-﻿namespace Xemio.Shared.Models.Notes
+﻿namespace Xemio.Server.Infrastructure.Entites
 {
     public interface IConcurrencyControlledEntity
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Xemio.Server.Infrastructure.Entites.Notes;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Database
@@ -21,7 +22,7 @@ namespace Xemio.Server.Infrastructure.Database
                 f.HasIndex(d => d.UserId);
                 f.Property(d => d.UserId).IsRequired();
                 f.Property(d => d.ETag).IsRowVersion();
-                f.HasMany(typeof(Folder)).WithOne().HasForeignKey(nameof(Folder.ParentFolderId));
+                f.HasMany(d => d.SubFolders).WithOne(d => d.ParentFolder);
             });
         }
 
