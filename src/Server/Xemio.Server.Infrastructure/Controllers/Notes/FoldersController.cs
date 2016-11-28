@@ -40,7 +40,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
         
         [HttpGet(Name = RouteNames.GetFolders)]
-        public async Task<IActionResult> GetFolders(Guid? folderId = null)
+        public async Task<IActionResult> GetFoldersAsync(Guid? folderId = null)
         {
             var folders = await this._xemioContext.Folders
                 .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolder.Id == folderId)
@@ -52,7 +52,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpGet("{folderId}", Name = RouteNames.GetFolderByFolderId)]
-        public async Task<IActionResult> GetFolder(Guid folderId)
+        public async Task<IActionResult> GetFolderAsync(Guid folderId)
         {
             EnsureArg.IsNotEmpty(folderId, nameof(folderId));
 
@@ -67,7 +67,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
         
         [HttpPost(Name = RouteNames.CreateFolder)]
-        public async Task<IActionResult> PostFolder([FromBody]CreateFolder data)
+        public async Task<IActionResult> PostFolderAsync([FromBody]CreateFolder data)
         {
             EnsureArg.IsNotNull(data, nameof(data));
 
@@ -89,7 +89,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpDelete("{folderId}", Name = RouteNames.DeleteFolder)]
-        public async Task<IActionResult> DeleteFolder(Guid folderId, [FromQuery]byte[] etag = null)
+        public async Task<IActionResult> DeleteFolderAsync(Guid folderId, [FromQuery]byte[] etag = null)
         {
             EnsureArg.IsNotEmpty(folderId, nameof(folderId));
 
