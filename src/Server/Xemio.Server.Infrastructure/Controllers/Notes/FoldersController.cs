@@ -74,8 +74,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             var folder = new Folder
             {
                 Name = data.Name,
-                ParentFolder = data.ParentFolderId != null 
-                    ? await this._xemioContext.FindAsync<Folder>(data.ParentFolderId) 
+                ParentFolder = string.IsNullOrWhiteSpace(data.ParentFolderId) == false 
+                    ? await this._xemioContext.FindAsync<Folder>(Guid.Parse(data.ParentFolderId)) 
                     : null,
                 UserId = this.User.Identity.Name
             };
