@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Xemio.Server.Contracts.Mapping;
 using Xemio.Server.Infrastructure.Database;
 using Xemio.Server.Infrastructure.Entites.Notes;
 using Xemio.Server.Infrastructure.Extensions;
@@ -27,12 +28,15 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         private readonly XemioContext _xemioContext;
+        private readonly IMapper<Folder, FolderDTO> _folderToFolderDTOMapper;
 
-        public FoldersController(XemioContext xemioContext)
+        public FoldersController(XemioContext xemioContext, IMapper<Folder, FolderDTO> folderToFolderDTOMapper)
         {
             EnsureArg.IsNotNull(xemioContext, nameof(xemioContext));
+            EnsureArg.IsNotNull(folderToFolderDTOMapper, nameof(folderToFolderDTOMapper));
 
             this._xemioContext = xemioContext;
+            this._folderToFolderDTOMapper = folderToFolderDTOMapper;
         }
         
         [HttpGet(Name = RouteNames.GetFolders)]
@@ -42,7 +46,9 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
                 .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolder.Id == folderId)
                 .ToListAsync();
 
-            return this.Ok(folders);
+            var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
+
+            return this.Ok(folderDTOs);
         }
 
         [HttpGet("{folderId}", Name = RouteNames.GetFolderByFolderId)]
@@ -55,7 +61,9 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             if (folder == null)
                 return this.NotFound();
 
-            return this.Ok(folder);
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+
+            return this.Ok(folderDTO);
         }
         
         [HttpPost(Name = RouteNames.CreateFolder)]
@@ -75,7 +83,9 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             await this._xemioContext.AddAsync(folder);
             await this._xemioContext.SaveChangesAsync();
 
-            return this.Created(this.Url.Link(RouteNames.GetFolderByFolderId, new { folderId = folder.Id }), folder);
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+
+            return this.Created(this.Url.Link(RouteNames.GetFolderByFolderId, new { folderId = folder.Id }), folderDTO);
         }
 
         [HttpDelete("{folderId}", Name = RouteNames.DeleteFolder)]

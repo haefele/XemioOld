@@ -1,0 +1,2 @@
+Add-Migration [Name] -OutputDir Database/Migrations
+protoc --csharp_out=.\Notes\ --csharp_opt=file_extension=.g.cs Notes.proto

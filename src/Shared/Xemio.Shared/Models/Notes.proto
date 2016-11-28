@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+package Xemio;
+
+option csharp_namespace = "Xemio.Shared.Models.Notes";
+
+message FolderDTO {
+	string id = 1;
+	string name = 2;
+	string parentFolderId = 3;
+	string userId = 4;
+	bytes etag = 5;
+}

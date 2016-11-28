@@ -9,6 +9,8 @@ using System;
 using Xemio.Hosts.AspNetCore.Setup;
 using Xemio.Server.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using Xemio.Server.Contracts.Mapping;
+using Xemio.Server.Infrastructure.Mapping;
 
 namespace Xemio.Hosts.AspNetCore
 {
@@ -29,6 +31,7 @@ namespace Xemio.Hosts.AspNetCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDatabase(this.Configuration.GetSection("Database"));
+            services.AddMappers();
             services.AddCors();
             services.AddMvc();
             services.AddLogging();
