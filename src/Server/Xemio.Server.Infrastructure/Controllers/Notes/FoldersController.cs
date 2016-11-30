@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             public const string GetFolders = nameof(GetFolders);
             public const string GetFolderByFolderId = nameof(GetFolderByFolderId);
             public const string CreateFolder = nameof(CreateFolder);
+            public const string UpdateFolder = nameof(UpdateFolder);
             public const string DeleteFolder = nameof(DeleteFolder);
         }
 
@@ -86,6 +88,53 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
             return this.Created(this.Url.Link(RouteNames.GetFolderByFolderId, new { folderId = folder.Id }), folderDTO);
+        }
+
+        [HttpPatch("{folderId}", Name = RouteNames.UpdateFolder)]
+        public async Task<IActionResult> PatchFolderAsync(Guid folderId, [FromBody]JObject data, [FromQuery]byte[] etag = null)
+        {
+            EnsureArg.IsNotNull(data, nameof(data));
+            
+            var folder = await this._xemioContext.FindAsync<Folder>(folderId);
+
+            if (folder == null)
+                return this.NotFound();
+
+            if (etag != null)
+                this._xemioContext.Entry(folder).ETagForConcurrencyControlIs(etag);
+
+            JToken nameToken;
+            if (data.TryGetValue(nameof(FolderDTO.Name), StringComparison.OrdinalIgnoreCase, out nameToken))
+            {
+                var name = nameToken.ToObject<string>();
+                folder.Name = name;
+            }
+
+            JToken parentFolderIdToken;
+            if (data.TryGetValue(nameof(FolderDTO.ParentFolderId), StringComparison.OrdinalIgnoreCase, out parentFolderIdToken))
+            {
+                await this._xemioContext.Entry(folder)
+                    .Reference(f => f.ParentFolder)
+                    .LoadAsync();
+
+                var parentFolderId = parentFolderIdToken.ToObject<Guid?>();
+
+                if (parentFolderId == null)
+                {
+                    folder.ParentFolder = null;
+                }
+                else
+                {
+                    var parentFolder = await this._xemioContext.FindAsync<Folder>(parentFolderId.Value);
+
+                    if (parentFolder != null)
+                        folder.ParentFolder = parentFolder;
+                }
+            }
+
+            await this._xemioContext.SaveChangesAsync();
+
+            return this.Ok();
         }
 
         [HttpDelete("{folderId}", Name = RouteNames.DeleteFolder)]
