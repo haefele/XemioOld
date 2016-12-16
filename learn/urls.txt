@@ -18,3 +18,6 @@ https://github.com/auth0/Auth0.Windows.UWP
 
 Localization:
 https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization
+
+Auth0 call Facebook/Microsoft/Identity Provider API:
+https://auth0.com/docs/tutorials/calling-an-external-idp-api
