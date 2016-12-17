@@ -1,26 +1,21 @@
-﻿using System;
-using Xemio.Server.Infrastructure.Entites.Notes;
-using Xemio.Shared.Models.Notes;
+﻿using Xemio.Shared.Models.Notes;
 using Xemio.Server.Contracts.Mapping;
 using System.Threading.Tasks;
-using Google.Protobuf;
 using EnsureThat;
 using Xemio.Server.Infrastructure.Database;
+using Xemio.Server.Infrastructure.Entities.Notes;
 
 namespace Xemio.Server.Infrastructure.Mapping
 {
 
     public class FolderToFolderDTOMapper : MapperBase<Folder, FolderDTO>
     {
-        private readonly IMapper<Guid?, string> _guidToStringMapper;
         private readonly XemioContext _xemioContext;
 
-        public FolderToFolderDTOMapper(IMapper<Guid?, string> guidToStringMapper, XemioContext xemioContext)
+        public FolderToFolderDTOMapper(XemioContext xemioContext)
         {
-            EnsureArg.IsNotNull(guidToStringMapper, nameof(guidToStringMapper));
             EnsureArg.IsNotNull(xemioContext, nameof(xemioContext));
-
-            this._guidToStringMapper = guidToStringMapper;
+            
             this._xemioContext = xemioContext;
         }
 
@@ -30,16 +25,20 @@ namespace Xemio.Server.Infrastructure.Mapping
                 return null;
 
             await this._xemioContext.Entry(input)
-                .Reference(F => F.ParentFolder)
+                .Reference(f => f.ParentFolder)
+                .LoadAsync();
+
+            await this._xemioContext.Entry(input)
+                .Collection(f => f.SubFolders)
                 .LoadAsync();
 
             return new FolderDTO
             {
-                Id = await this._guidToStringMapper.MapAsync(input.Id),
-                Etag = ByteString.CopyFrom(input.ETag),
+                Id = input.Id,
+                ETag = input.ETag,
                 Name = input.Name,
-                ParentFolderId = await this._guidToStringMapper.MapAsync(input.ParentFolder?.Id) ?? string.Empty,
-                UserId = input.UserId,
+                ParentFolderId = input.ParentFolder?.Id,
+                SubFoldersCount = input.SubFolders.Count,
             };
         }
     }

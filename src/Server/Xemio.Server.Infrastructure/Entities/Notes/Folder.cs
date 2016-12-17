@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Xemio.Server.Infrastructure.Entites.Notes
+namespace Xemio.Server.Infrastructure.Entities.Notes
 {
     public class Folder : IEntity, IConcurrencyControlledEntity
     {

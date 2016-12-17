@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Xemio.Server.Infrastructure.Entites
+namespace Xemio.Server.Infrastructure.Entities
 {
     interface IEntity
     {

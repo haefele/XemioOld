@@ -1,4 +1,4 @@
-﻿namespace Xemio.Server.Infrastructure.Entites
+﻿namespace Xemio.Server.Infrastructure.Entities
 {
     public interface IConcurrencyControlledEntity
     {

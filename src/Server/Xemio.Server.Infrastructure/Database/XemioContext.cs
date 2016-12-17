@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Xemio.Server.Infrastructure.Entites.Notes;
+using Xemio.Server.Infrastructure.Entities.Notes;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Database
