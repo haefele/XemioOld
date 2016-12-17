@@ -10,7 +10,7 @@
     <PackageReference Include="Ensure.That" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.0-preview4-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.0.0-msbuild2-final" />
     <PackageReference Include="NETStandard.Library" Version="1.6.1" />
     <PackageReference Include="NSwag.AspNetCore" Version="7.7.0" />
   </ItemGroup>
