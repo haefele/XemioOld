@@ -12,5 +12,6 @@ namespace Xemio.Shared.Models.Notes
         public Guid? ParentFolderId { get; set; }
         public byte[] ETag { get; set; }
         public int SubFoldersCount { get; set; }
+        public int NotesCount { get; set; }
     }
 }

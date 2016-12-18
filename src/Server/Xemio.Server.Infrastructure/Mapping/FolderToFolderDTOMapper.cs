@@ -32,6 +32,10 @@ namespace Xemio.Server.Infrastructure.Mapping
                 .Collection(f => f.SubFolders)
                 .LoadAsync();
 
+            await this._xemioContext.Entry(input)
+                .Collection(f => f.Notes)
+                .LoadAsync();
+
             return new FolderDTO
             {
                 Id = input.Id,
@@ -39,6 +43,7 @@ namespace Xemio.Server.Infrastructure.Mapping
                 Name = input.Name,
                 ParentFolderId = input.ParentFolder?.Id,
                 SubFoldersCount = input.SubFolders.Count,
+                NotesCount = input.Notes.Count,
             };
         }
     }
