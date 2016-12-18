@@ -8,9 +8,10 @@ using Xemio.Server.Infrastructure.Database;
 namespace Xemio.Server.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(XemioContext))]
-    partial class XemioContextModelSnapshot : ModelSnapshot
+    [Migration("20161218211424_AddNotes")]
+    partial class AddNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752")

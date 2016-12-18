@@ -18,6 +18,7 @@ namespace Xemio.Server.Infrastructure.Entities.Notes
         public Folder ParentFolder { get; set; }
 
         public IList<Folder> SubFolders { get; set; }
+        public IList<Note> Notes { get; set; }
 
         public byte[] ETag { get; set; }
     }
