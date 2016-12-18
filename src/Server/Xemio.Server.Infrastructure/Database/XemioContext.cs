@@ -20,6 +20,7 @@ namespace Xemio.Server.Infrastructure.Database
             {
                 f.HasKey(d => d.Id);
                 f.HasIndex(d => d.UserId);
+                f.Property(d => d.Name).HasMaxLength(200).IsRequired();
                 f.Property(d => d.UserId).IsRequired();
                 f.Property(d => d.ETag).IsRowVersion();
                 f.HasMany(d => d.SubFolders).WithOne(d => d.ParentFolder);

@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
+    <NuGetPackageRoot>$(USERPROFILE)\.nuget\packages\</NuGetPackageRoot>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Ensure.That" Version="5.0.0" />
