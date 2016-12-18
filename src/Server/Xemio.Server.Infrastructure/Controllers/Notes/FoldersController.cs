@@ -60,8 +60,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
         [HttpGet("{folderId:guid}/folders", Name = RouteNames.GetSubFolders)]
         [Description("Get all sub folders from the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status200OK, typeof(IList<FolderDTO>), Description = "All sub folders.")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         public async Task<IActionResult> GetSubFoldersAsync(Guid folderId)
         {
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
@@ -84,8 +84,6 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         public async Task<IActionResult> GetFolderAsync(Guid folderId)
         {
-            EnsureArg.IsNotEmpty(folderId, nameof(folderId));
-
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
@@ -101,7 +99,11 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [SwaggerResponse(StatusCodes.Status201Created, typeof(FolderDTO), Description = "The folder was created.")]
         public async Task<IActionResult> PostFolderAsync([FromBody]CreateFolder data)
         {
-            EnsureArg.IsNotNull(data, nameof(data));
+            if (data == null)
+                return this.BadRequest();
+
+            if (string.IsNullOrWhiteSpace(data.Name))
+                return this.BadRequest("The folder name must be non empty.");
 
             var folder = new Folder
             {
@@ -122,13 +124,14 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
         [HttpPatch("{folderId:guid}", Name = RouteNames.UpdateFolder)]
         [Description("Update the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status200OK, typeof(void), Description = "The folder was updated.")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
         public async Task<IActionResult> PatchFolderAsync(Guid folderId, [FromBody]JObject data, [FromQuery]byte[] etag = null)
         {
-            EnsureArg.IsNotNull(data, nameof(data));
-            
+            if (data == null)
+                return this.BadRequest();
+
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
@@ -166,16 +169,18 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
             await this._xemioContext.SaveChangesAsync();
 
-            return this.Ok();
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+
+            return this.Ok(folderDTO);
         }
 
         [HttpDelete("{folderId:guid}", Name = RouteNames.DeleteFolder)]
         [Description("Delete the specified folder and all subfolders.")]
+        [SwaggerResponse(StatusCodes.Status200OK, typeof(void), Description = "The folder was deleted.")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
         public async Task<IActionResult> DeleteFolderAsync(Guid folderId, [FromQuery]byte[] etag = null)
         {
-            EnsureArg.IsNotEmpty(folderId, nameof(folderId));
-            
             Folder folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
