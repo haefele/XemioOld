@@ -1,21 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25914.0
+VisualStudioVersion = 15.0.26014.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{140948E9-135B-4094-ADFA-3FBCAABFF042}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Shared", "Shared\Xemio.Shared\Xemio.Shared.csproj", "{524EC1E1-3949-47A2-AB69-2A125660E06B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Shared", "src\Shared\Xemio.Shared\Xemio.Shared.csproj", "{524EC1E1-3949-47A2-AB69-2A125660E06B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8E240DA3-0DAE-470E-B6DD-3222B1A1250E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Contracts", "Server\Xemio.Server.Contracts\Xemio.Server.Contracts.csproj", "{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Contracts", "src\Server\Xemio.Server.Contracts\Xemio.Server.Contracts.csproj", "{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Infrastructure", "Server\Xemio.Server.Infrastructure\Xemio.Server.Infrastructure.csproj", "{448324E3-08B4-4BEA-9269-0A878B66DA73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Server.Infrastructure", "src\Server\Xemio.Server.Infrastructure\Xemio.Server.Infrastructure.csproj", "{448324E3-08B4-4BEA-9269-0A878B66DA73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hosts", "Hosts", "{A3217A47-262E-4E17-B4D2-0D0F75B29676}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Hosts.AspNetCore", "Hosts\Xemio.Hosts.AspNetCore\Xemio.Hosts.AspNetCore.csproj", "{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xemio.Hosts.AspNetCore", "src\Hosts\Xemio.Hosts.AspNetCore\Xemio.Hosts.AspNetCore.csproj", "{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{996D357D-CDA9-454E-BDD3-64D22B03689A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "learn", "learn", "{B593FE14-BF8E-4C05-82BB-BD9F9312A2EB}"
+	ProjectSection(SolutionItems) = preProject
+		learn\command-line.txt = learn\command-line.txt
+		learn\recursive-delete.txt = learn\recursive-delete.txt
+		learn\urls.txt = learn\urls.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,9 +53,12 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{140948E9-135B-4094-ADFA-3FBCAABFF042} = {996D357D-CDA9-454E-BDD3-64D22B03689A}
 		{524EC1E1-3949-47A2-AB69-2A125660E06B} = {140948E9-135B-4094-ADFA-3FBCAABFF042}
+		{8E240DA3-0DAE-470E-B6DD-3222B1A1250E} = {996D357D-CDA9-454E-BDD3-64D22B03689A}
 		{D0F23D95-F683-45E2-B9F9-C686D1D7B9B9} = {8E240DA3-0DAE-470E-B6DD-3222B1A1250E}
 		{448324E3-08B4-4BEA-9269-0A878B66DA73} = {8E240DA3-0DAE-470E-B6DD-3222B1A1250E}
+		{A3217A47-262E-4E17-B4D2-0D0F75B29676} = {996D357D-CDA9-454E-BDD3-64D22B03689A}
 		{FA92B844-0AF3-4066-9BA6-8E9C44C13EDF} = {A3217A47-262E-4E17-B4D2-0D0F75B29676}
 	EndGlobalSection
 EndGlobal
