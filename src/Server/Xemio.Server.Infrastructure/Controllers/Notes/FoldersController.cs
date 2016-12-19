@@ -8,6 +8,7 @@ using NSwag.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Xemio.Server.Contracts.Mapping;
@@ -62,7 +63,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [Description("Get all sub folders from the specified folder.")]
         [SwaggerResponse(StatusCodes.Status200OK, typeof(IList<FolderDTO>), Description = "All sub folders.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        public async Task<IActionResult> GetSubFoldersAsync(Guid folderId)
+        public async Task<IActionResult> GetSubFoldersAsync([Required]Guid? folderId)
         {
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
@@ -82,7 +83,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [Description("Get the specified folder.")]
         [SwaggerResponse(StatusCodes.Status200OK, typeof(FolderDTO), Description = "The folder.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        public async Task<IActionResult> GetFolderAsync(Guid folderId)
+        public async Task<IActionResult> GetFolderAsync([Required]Guid? folderId)
         {
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
@@ -97,14 +98,9 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [HttpPost(Name = RouteNames.CreateFolder)]
         [Description("Create a new folder.")]
         [SwaggerResponse(StatusCodes.Status201Created, typeof(FolderDTO), Description = "The folder was created.")]
-        public async Task<IActionResult> PostFolderAsync([FromBody]CreateFolder data)
+        [SwaggerResponse(StatusCodes.Status400BadRequest, typeof(void), Description = "Some parameters are incorrect.")]
+        public async Task<IActionResult> PostFolderAsync([FromBody][Required]CreateFolder data)
         {
-            if (data == null)
-                return this.BadRequest();
-
-            if (string.IsNullOrWhiteSpace(data.Name))
-                return this.BadRequest("The folder name must be non empty.");
-
             var folder = new Folder
             {
                 Name = data.Name,
@@ -119,19 +115,17 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
-            return this.Created(this.Url.Link(RouteNames.GetFolderById, new { folderId = folder.Id }), folderDTO);
+            return this.CreatedAtRoute(RouteNames.GetFolderById, new { folderId = folder.Id }, folderDTO);
         }
 
         [HttpPatch("{folderId:guid}", Name = RouteNames.UpdateFolder)]
         [Description("Update the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(void), Description = "The folder was updated.")]
+        [SwaggerResponse(StatusCodes.Status200OK, typeof(FolderDTO), Description = "The folder was updated.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, typeof(void), Description = "Some parameters are incorrect")]
         [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
-        public async Task<IActionResult> PatchFolderAsync(Guid folderId, [FromBody]JObject data, [FromQuery]byte[] etag = null)
+        public async Task<IActionResult> PatchFolderAsync([Required]Guid? folderId, [FromBody][Required]JObject data, [FromQuery]byte[] etag = null)
         {
-            if (data == null)
-                return this.BadRequest();
-
             var folder = await this._xemioContext.FindAsync<Folder>(folderId);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
@@ -179,7 +173,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         [SwaggerResponse(StatusCodes.Status200OK, typeof(void), Description = "The folder was deleted.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
         [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
-        public async Task<IActionResult> DeleteFolderAsync(Guid folderId, [FromQuery]byte[] etag = null)
+        public async Task<IActionResult> DeleteFolderAsync([Required]Guid? folderId, [FromQuery]byte[] etag = null)
         {
             Folder folder = await this._xemioContext.FindAsync<Folder>(folderId);
 

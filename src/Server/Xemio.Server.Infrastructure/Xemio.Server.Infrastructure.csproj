@@ -8,6 +8,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ensure.That" Version="5.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="6.4.0-beta9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.0.0-msbuild2-final" />

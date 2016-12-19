@@ -7,7 +7,6 @@ using Xemio.Server.Infrastructure.Entities.Notes;
 
 namespace Xemio.Server.Infrastructure.Mapping
 {
-
     public class FolderToFolderDTOMapper : MapperBase<Folder, FolderDTO>
     {
         private readonly XemioContext _xemioContext;

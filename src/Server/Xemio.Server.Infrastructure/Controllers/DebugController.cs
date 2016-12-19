@@ -25,7 +25,7 @@ namespace Xemio.Server.Infrastructure.Controllers
             {
                 UserId = "auth0|58318a1b9ca666c66c96d2c6",
                 Title = "Erste Notiz!",
-                Folder = await this._xemioContext.Folders.FindAsync(Guid.Parse("D5F88EB7-470E-4448-2485-08D417D94987")),
+                Folder = await this._xemioContext.Folders.FindAsync(Guid.Parse("D002CC11-D7A3-42D7-9047-08D417D78446")),
                 Content = "Inhalt hier!",
             };
             await this._xemioContext.Notes.AddAsync(note);

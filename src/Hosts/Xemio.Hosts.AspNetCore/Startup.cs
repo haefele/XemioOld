@@ -6,9 +6,11 @@ using NJsonSchema;
 using NSwag.AspNetCore;
 using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Security;
 using System.Reflection;
+using FluentValidation.AspNetCore;
 using Xemio.Hosts.AspNetCore.Setup;
 using Xemio.Server.Infrastructure.Controllers.Notes;
 using Xemio.Server.Infrastructure.Filters;
+using Xemio.Server.Infrastructure.Validators;
 
 namespace Xemio.Hosts.AspNetCore
 {
@@ -34,10 +36,14 @@ namespace Xemio.Hosts.AspNetCore
             services.AddCors();
             services.AddLogging();
 
-            services.AddMvc(f =>
-            {
-                f.Filters.Add(typeof(ConcurrencyExceptionFilterAttribute));
-            });
+            services
+                .AddMvc(f =>
+                    {
+                        f.Filters.Add(typeof(ConcurrencyExceptionFilterAttribute));
+                        f.Filters.Add(typeof(RequiredParameterFilterAttribute));
+                        f.Filters.Add(typeof(ValidModelStateFilterAttribute));
+                    })
+                .AddFluentValidation(f => f.RegisterValidatorsFromAssemblyContaining<CreateFolderValidator>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
