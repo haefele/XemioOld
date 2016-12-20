@@ -24,3 +24,6 @@ https://auth0.com/docs/tutorials/calling-an-external-idp-api
 
 Editorconfig for VS2017:
 https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference#this_and_me
+
+Foundatio:
+https://github.com/exceptionless/Foundatio
