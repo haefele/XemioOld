@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 
 namespace Xemio.Hosts.AspNetCore.Setup
 {
@@ -16,7 +17,7 @@ namespace Xemio.Hosts.AspNetCore.Setup
                 {
                     ValidIssuer = $"https://{configuration.GetValue<string>("Domain")}/",
                     ValidAudience = configuration.GetValue<string>("ClientId"),
-                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration.GetValue<string>("ClientSecret"))),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("ClientSecret"))),
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
                 }
             });

@@ -3,78 +3,58 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using EnsureThat;
-using Newtonsoft.Json;
-using Xemio.Client.Errors;
+using Newtonsoft.Json.Linq;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Client.Notes
 {
-    public class FoldersClient : ClientBase
+    public class FoldersClient : ClientBase, IFoldersClient
     {
-        public const string ApiEndpoint = "/notes/folders";
-
         public FoldersClient(string bearerToken, HttpMessageHandler httpMessageHandler = null)
-            : base(ApiEndpoint, bearerToken, httpMessageHandler)
+            : base(bearerToken, httpMessageHandler)
         {
         }
         
-        public Task<IList<FolderDTO>> GetRootFoldersAsync(CancellationToken cancellationToken)
+        public Task<IList<FolderDTO>> GetRootFoldersAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return base.GetAsync<IList<FolderDTO>>(string.Empty, cancellationToken);
-        }
-    }
-
-    public abstract class ClientBase : IDisposable
-    {
-        public const string ApiBaseAddress = "http://localhost:9000";
-        public const string AuthorizationScheme = "Bearer";
-
-        public HttpClient HttpClient { get; }
-        public string BearerToken { get; }
-        
-        protected ClientBase(string baseEndpoint, string bearerToken, HttpMessageHandler httpMessageHandler = null)
-        {
-            EnsureArg.IsNotNullOrWhiteSpace(baseEndpoint, nameof(baseEndpoint));
-            EnsureArg.IsNotNullOrWhiteSpace(bearerToken, nameof(bearerToken));
-            
-            this.HttpClient = new HttpClient(httpMessageHandler ?? new HttpClientHandler());
-            this.HttpClient.BaseAddress = new Uri(ApiBaseAddress + baseEndpoint);
-            this.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthorizationScheme, bearerToken);
-
-            this.BearerToken = bearerToken;
+            return base.GetAsync<IList<FolderDTO>>("notes/folders", cancellationToken, HttpStatusCode.OK);
         }
 
-        public void Dispose()
+        public Task<IList<FolderDTO>> GetSubFoldersAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-        }
-        
-        internal async Task<T> GetAsync<T>(string path, CancellationToken cancellationToken)
-        {
-            var response = await this.HttpClient.GetAsync(path, cancellationToken);
-
-            this.ValidateResponse(response, HttpStatusCode.OK);
-
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content);
+            return base.GetAsync<IList<FolderDTO>>($"notes/folders/{folderId:D}/folders", cancellationToken, HttpStatusCode.OK);
         }
 
-        private void ValidateResponse(HttpResponseMessage responseMessage, HttpStatusCode expectedStatusCode)
+        public Task<FolderDTO> GetFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
-                throw new UnauthorizedException("The request is not authorized to access this data.");
+            return base.GetAsync<FolderDTO>($"notes/folders/{folderId:D}", cancellationToken, HttpStatusCode.OK);
+        }
 
-            if (responseMessage.StatusCode == HttpStatusCode.Conflict)
-                throw new ConflictException("The data changed in the meantime.");
+        public Task<FolderDTO> CreateFolderAsync(CreateFolder data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return base.PostAsync<FolderDTO>("notes/folders", data, cancellationToken, HttpStatusCode.Created);
+        }
 
-            if (responseMessage.StatusCode == HttpStatusCode.BadRequest)
-                throw new BadRequestException("oopsie");
+        public Task<FolderDTO> UpdateFolderAsync(Guid folderId, JObject changes, byte[] etag = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var query = new Dictionary<string, string>();
 
-            if (responseMessage.StatusCode != expectedStatusCode)
-                throw new Exception("Shit is going dooooown!");
+            if (etag != null)
+                query["etag"] = Convert.ToBase64String(etag);
+
+            return base.PatchAsync<FolderDTO>($"notes/folders/{folderId:D}", query, changes, cancellationToken, HttpStatusCode.OK);
+        }
+
+        public Task DeleteFolderAsync(Guid folderId, byte[] etag = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var query = new Dictionary<string, string>();
+
+            if (etag != null)
+                query["etag"] = Convert.ToBase64String(etag);
+
+            return base.DeleteAsync<object>($"notes/folders/{folderId:D}", query, null, cancellationToken, HttpStatusCode.OK);
         }
     }
 }

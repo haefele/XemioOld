@@ -1,4 +1,6 @@
-﻿using Xemio.Shared.Models.Notes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Xemio.Shared.Models.Notes;
 using Xemio.Server.Contracts.Mapping;
 using System.Threading.Tasks;
 using EnsureThat;
@@ -17,7 +19,7 @@ namespace Xemio.Server.Infrastructure.Mapping
             
             this._xemioContext = xemioContext;
         }
-
+        
         public override async Task<FolderDTO> MapAsync(Folder input)
         {
             if (input == null)

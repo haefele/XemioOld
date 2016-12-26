@@ -1,0 +1,14 @@
+﻿<Page
+    x:Class="Xemio.Apps.Windows.Views.Login.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Xemio.Apps.Windows.Views.Login"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:notes="using:Xemio.Shared.Models.Notes"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button Content="Login" Command="{x:Bind ViewModel.Login}" />
+    </Grid>
+</Page>

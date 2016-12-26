@@ -36,7 +36,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             this._xemioContext = xemioContext;
             this._noteToNoteDTOMapper = noteToNoteDTOMapper;
         }
-
+        
         [HttpGet("{noteId:guid}", Name = RouteNames.GetNoteById)]
         [Description("Get the specified note.")]
         [SwaggerResponse(StatusCodes.Status200OK, typeof(NoteDTO), Description = "The note.")]

@@ -9,7 +9,7 @@ namespace Xemio.Server.Contracts.Mapping
     {
         public abstract Task<TOut> MapAsync(TIn input);
 
-        public async Task<IList<TOut>> MapListAsync(IList<TIn> input)
+        public virtual async Task<IList<TOut>> MapListAsync(IList<TIn> input)
         {
             var result = new List<TOut>();
             foreach (var i in input)
