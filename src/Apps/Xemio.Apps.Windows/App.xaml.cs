@@ -9,7 +9,9 @@ using Xemio.Apps.Windows.Services.Auth;
 using Xemio.Apps.Windows.Services.Queries;
 using Xemio.Apps.Windows.Services.Queries.Folders;
 using Xemio.Apps.Windows.ShellModes;
+using Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy;
 using Xemio.Apps.Windows.Views.Login;
+using Xemio.Apps.Windows.Views.Notes;
 
 namespace Xemio.Apps.Windows
 {
@@ -46,11 +48,15 @@ namespace Xemio.Apps.Windows
         {
             //Queries
             builder.RegisterType<GetRootFoldersQueryHandler>().AsImplementedInterfaces();
+            builder.RegisterType<GetSubFoldersQueryHandler>().AsImplementedInterfaces();
         }
 
         public override IEnumerable<Type> GetViewModelTypes()
         {
             yield return typeof(LoginViewModel);
+            yield return typeof(NotesViewModel);
+
+            yield return typeof(NoteFolderHierarchyViewModel);
         }
 
         public override IEnumerable<Type> GetShellModeTypes()

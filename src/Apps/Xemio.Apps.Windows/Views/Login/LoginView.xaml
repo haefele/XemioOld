@@ -9,6 +9,10 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Button Content="Login" Command="{x:Bind ViewModel.Login}" />
+        <Button Content="Login with Microsoft account" 
+                Command="{x:Bind ViewModel.Login}" 
+                HorizontalAlignment="Center"
+                Background="DodgerBlue"
+                />
     </Grid>
 </Page>

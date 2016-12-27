@@ -95,6 +95,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Services\Auth\User.cs" />
+    <Compile Include="ShellModes\LoggedInShellMode.cs" />
     <Compile Include="ShellModes\LoggedOutShellMode.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -110,6 +112,10 @@
     <Compile Include="Services\Queries\QueryCache.cs" />
     <Compile Include="Services\Queries\QueryExecutor.cs" />
     <Compile Include="Services\Queries\QueryResult.cs" />
+    <Compile Include="ViewParts\NoteFolderHierarchy\NoteFolderHierarchyView.xaml.cs">
+      <DependentUpon>NoteFolderHierarchyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewParts\NoteFolderHierarchy\NoteFolderHierarchyViewModel.cs" />
     <Compile Include="Views\Login\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
@@ -152,6 +158,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ViewParts\NoteFolderHierarchy\NoteFolderHierarchyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Login\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

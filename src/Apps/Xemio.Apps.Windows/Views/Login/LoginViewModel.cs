@@ -26,16 +26,14 @@ namespace Xemio.Apps.Windows.Views.Login
     {
         private readonly IAuthService _authService;
         private readonly IApplicationStateService _applicationStateService;
-        private readonly IContainer _container;
         private readonly IShell _shell;
 
         public UwCoreCommand<Unit> Login { get; }
 
-        public LoginViewModel(IAuthService authService, IApplicationStateService applicationStateService, IContainer container, IShell shell)
+        public LoginViewModel(IAuthService authService, IApplicationStateService applicationStateService, IShell shell)
         {
             this._authService = authService;
             this._applicationStateService = applicationStateService;
-            this._container = container;
             this._shell = shell;
 
             this.Login = UwCoreCommand
@@ -44,19 +42,16 @@ namespace Xemio.Apps.Windows.Views.Login
                 .HandleExceptions();
         }
 
-        private async Task LoginImpl(CancellationToken arg)
+        private async Task LoginImpl(CancellationToken cancellationToken)
         {
             var user = await this._authService.LoginAsync();
+            if (user != null)
+            {
+                this._applicationStateService.SetCurrentUser(user);
+                await this._applicationStateService.SaveStateAsync();
 
-            this._applicationStateService.SetCurrentUser(user);
-            await this._applicationStateService.SaveStateAsync();
-
-            this._shell.CurrentMode = IoC.Get<LoggedInShellMode>();
-        }
-
-        protected override async void OnActivate()
-        {
-            base.OnActivate();
+                this._shell.CurrentMode = IoC.Get<LoggedInShellMode>();
+            }
         }
     }
 }

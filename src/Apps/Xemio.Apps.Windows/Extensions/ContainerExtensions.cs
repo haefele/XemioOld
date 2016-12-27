@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Xemio.Apps.Windows.Services.Auth;
 using Xemio.Client.Notes;
 
@@ -14,7 +9,7 @@ namespace Xemio.Apps.Windows.Extensions
         public static void UpdateClients(this IContainer container, User currentUser)
         {
             var builder = new ContainerBuilder();
-            void RegisterWebService<T>() => builder.RegisterType<T>().AsImplementedInterfaces().SingleInstance().WithParameter(new PositionalParameter(0, currentUser.IdToken));
+            void RegisterWebService<T>() => builder.RegisterType<T>().AsImplementedInterfaces().SingleInstance().WithParameter(new PositionalParameter(0, currentUser?.IdToken));
 
             RegisterWebService<FoldersClient>();
 

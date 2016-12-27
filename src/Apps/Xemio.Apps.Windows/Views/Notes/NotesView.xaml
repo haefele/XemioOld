@@ -5,9 +5,16 @@
     xmlns:local="using:Xemio.Apps.Windows.Views.Notes"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:micro="using:Caliburn.Micro"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+        <ContentControl micro:View.Model="{Binding NoteFolderHierarchyViewModel}" />
     </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Icon="Add" Command="{x:Bind ViewModel.CreateFolder}" />
+        </CommandBar>
+    </Page.BottomAppBar>
 </Page>

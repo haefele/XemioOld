@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using UwCore.Common;
+using Xemio.Client.Errors;
 
 namespace Xemio.Apps.Windows.Services.Queries
 {
@@ -29,11 +30,15 @@ namespace Xemio.Apps.Windows.Services.Queries
                 var handler = this._container.Resolve(handlerType);
                 var method = handler.GetType().GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.ExecuteAsync));
 
-                TResult result = await (Task<TResult>)method.Invoke(handler, new object[] { query });
+                TResult result = await (Task<TResult>) method.Invoke(handler, new object[] {query});
 
                 await this._queryCache.CacheQueryAsync(query, result);
 
                 return new QueryResult<TResult>(false, result);
+            }
+            catch (UnauthorizedException)
+            {
+                throw;
             }
             catch
             {
