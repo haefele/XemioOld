@@ -9,12 +9,18 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ContentControl micro:View.Model="{Binding NoteFolderHierarchyViewModel}" />
-    </Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <ContentControl Grid.Row="0" 
+                        micro:View.Model="{Binding NoteFolderHierarchyViewModel}" />
 
-    <Page.BottomAppBar>
-        <CommandBar>
-            <AppBarButton Icon="Add" Command="{x:Bind ViewModel.CreateFolder}" />
+
+        <CommandBar Grid.Row="1">
+            <AppBarButton Icon="Add"
+                          Command="{x:Bind ViewModel.CreateFolder}" />
         </CommandBar>
-    </Page.BottomAppBar>
+    </Grid>
 </Page>

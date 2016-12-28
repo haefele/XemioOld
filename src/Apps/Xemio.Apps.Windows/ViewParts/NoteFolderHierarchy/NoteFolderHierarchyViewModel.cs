@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
 using UwCore;
@@ -16,34 +17,61 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
     {
         private readonly IQueryExecutor _queryExecutor;
 
+        private readonly ObservableCollection<FolderDTO> _parentFolders;
+        private FolderDTO _selectedParentFolder;
         private readonly ObservableAsPropertyHelper<ObservableCollection<ItemViewModel>> _itemsHelper;
+        private ItemViewModel _selectedItem;
 
-        public ObservableCollection<FolderDTO> ParentFolders { get; set; } = new ObservableCollection<FolderDTO>();
+        public ReadOnlyObservableCollection<FolderDTO> ParentFolders { get; }
+        public FolderDTO SelectedParentFolder
+        {
+            get { return this._selectedParentFolder; }
+            set { this.RaiseAndSetIfChanged(ref this._selectedParentFolder, value); }
+        }
         public ObservableCollection<ItemViewModel> Items => this._itemsHelper.Value;
+        public ItemViewModel SelectedItem
+        {
+            get { return this._selectedItem; }
+            set { this.RaiseAndSetIfChanged(ref this._selectedItem, value); }
+        }
 
-        public UwCoreCommand<ObservableCollection<ItemViewModel>> Refresh { get; }
+        public UwCoreCommand<ObservableCollection<ItemViewModel>> Reload { get; }
+        public UwCoreCommand<Unit> ShowSelectedItem { get; }
+        public UwCoreCommand<Unit> ShowSelectedParentFolder { get; }
 
         public NoteFolderHierarchyViewModel(IQueryExecutor queryExecutor)
         {
             Guard.NotNull(queryExecutor, nameof(queryExecutor));
 
             this._queryExecutor = queryExecutor;
+            
+            this.ParentFolders = new ReadOnlyObservableCollection<FolderDTO>(this._parentFolders = new ObservableCollection<FolderDTO>());
 
-            this.Refresh = UwCoreCommand
-                .Create(this.RefreshImpl)
+            this.Reload = UwCoreCommand
+                .Create(this.ReloadImpl)
                 .ShowLoadingOverlay("Loading")
                 .HandleExceptions();
-            this.Refresh.ToProperty(this, f => f.Items, out this._itemsHelper);
+            this.Reload.ToProperty(this, f => f.Items, out this._itemsHelper);
+
+            this.ShowSelectedItem = UwCoreCommand
+                .Create(this.ShowSelectedItemImpl)
+                .ShowLoadingOverlay("Oi")
+                .HandleExceptions();
+
+            this.ShowSelectedParentFolder = UwCoreCommand
+                .Create(this.ShowSelectedParentFolderImpl)
+                .ShowLoadingOverlay("Hoi")
+                .HandleExceptions();
         }
 
         protected override async void OnActivate()
         {
             base.OnActivate();
 
-            await this.Refresh.ExecuteAsync();
+            await this.Reload.ExecuteAsync();
         }
 
-        private async Task<ObservableCollection<ItemViewModel>> RefreshImpl()
+        private async Task<ObservableCollection<ItemViewModel>> ReloadImpl()
         {
             var currentFolder = this.ParentFolders.LastOrDefault();
 
@@ -53,16 +81,46 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
 
             return new ObservableCollection<ItemViewModel>(folders.Result.Select(f => new ItemViewModel(f)));
         }
-    }
 
+        private async Task ShowSelectedItemImpl()
+        {
+            if (this.SelectedItem.IsFolder)
+            {
+                this._parentFolders.Add(this.SelectedItem.Folder);
+                await this.Reload.ExecuteAsync();
+            }
+            else
+            {
+
+            }
+        }
+
+        private async Task ShowSelectedParentFolderImpl()
+        {
+            foreach (var folderAfterSelectedFolder in new List<FolderDTO>(this.ParentFolders.SkipWhile(f => f != this.SelectedParentFolder).Skip(1)))
+            {
+                this._parentFolders.Remove(folderAfterSelectedFolder);
+            }
+
+            this.SelectedParentFolder = null;
+            await this.Reload.ExecuteAsync();
+        }
+    }
 
     public class ItemViewModel : UwCorePropertyChangedBase
     {
         public ItemViewModel(FolderDTO folder)
         {
+            this.Folder = folder;
             this.Name = folder.Name;
         }
 
-        public string Name { get; set; }
+        public bool IsFolder => this.Folder != null;
+        public FolderDTO Folder { get; }
+
+        public bool IsNote => this.Note != null;
+        public NoteDTO Note { get; }
+
+        public string Name { get; }
     }
 }

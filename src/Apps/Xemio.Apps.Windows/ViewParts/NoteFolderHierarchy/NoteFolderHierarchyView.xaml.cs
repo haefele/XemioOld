@@ -1,4 +1,5 @@
 ﻿using Windows.UI.Xaml.Controls;
+using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
 {
@@ -9,6 +10,17 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
         public NoteFolderHierarchyView()
         {
             this.InitializeComponent();
+        }
+
+        private async void ItemsListView_OnItemClick(object sender, ItemClickEventArgs e)
+        {
+            this.ViewModel.SelectedItem = (ItemViewModel) e.ClickedItem;
+            await this.ViewModel.ShowSelectedItem.ExecuteAsync();
+        }
+        
+        private async void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            await this.ViewModel.ShowSelectedParentFolder.ExecuteAsync();
         }
     }
 }
