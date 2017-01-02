@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Graphics.Canvas.Text;
 using UwCore.Application;
 using UwCore.Hamburger;
 using Xemio.Apps.Windows.Views.Login;

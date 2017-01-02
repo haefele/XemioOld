@@ -2,7 +2,7 @@
 
 namespace Xemio.Server.Infrastructure.Entities.Notes
 {
-    public class Note : IEntity, IConcurrencyControlledEntity
+    public class Note : IEntity
     {
         public Guid Id { get; set; }
 
@@ -11,8 +11,6 @@ namespace Xemio.Server.Infrastructure.Entities.Notes
         public string Title { get; set; }
         public string Content { get; set; }
 
-        public Folder Folder { get; set; }
-
-        public byte[] ETag { get; set; }
+        public Guid FolderId { get; set; }
     }
 }

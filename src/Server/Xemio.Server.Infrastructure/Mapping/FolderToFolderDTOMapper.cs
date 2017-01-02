@@ -4,47 +4,38 @@ using Xemio.Shared.Models.Notes;
 using Xemio.Server.Contracts.Mapping;
 using System.Threading.Tasks;
 using EnsureThat;
-using Xemio.Server.Infrastructure.Database;
+using Raven.Client;
+using Raven.Client.Linq;
+using Xemio.Server.Infrastructure.Database.Indexes;
 using Xemio.Server.Infrastructure.Entities.Notes;
 
 namespace Xemio.Server.Infrastructure.Mapping
 {
     public class FolderToFolderDTOMapper : MapperBase<Folder, FolderDTO>
     {
-        private readonly XemioContext _xemioContext;
+        private readonly IAsyncDocumentSession _documentSession;
 
-        public FolderToFolderDTOMapper(XemioContext xemioContext)
+        public FolderToFolderDTOMapper(IAsyncDocumentSession documentSession)
         {
-            EnsureArg.IsNotNull(xemioContext, nameof(xemioContext));
-            
-            this._xemioContext = xemioContext;
+            this._documentSession = documentSession;
         }
-        
+
         public override async Task<FolderDTO> MapAsync(Folder input)
         {
             if (input == null)
                 return null;
 
-            await this._xemioContext.Entry(input)
-                .Reference(f => f.ParentFolder)
-                .LoadAsync();
-
-            await this._xemioContext.Entry(input)
-                .Collection(f => f.SubFolders)
-                .LoadAsync();
-
-            await this._xemioContext.Entry(input)
-                .Collection(f => f.Notes)
-                .LoadAsync();
+            var counts = await this._documentSession.Query<Folders_ByChildrenCount.Result, Folders_ByChildrenCount>()
+                .Where(f => f.FolderId == input.Id)
+                .FirstOrDefaultAsync();
 
             return new FolderDTO
             {
                 Id = input.Id,
-                ETag = input.ETag,
                 Name = input.Name,
-                ParentFolderId = input.ParentFolder?.Id,
-                SubFoldersCount = input.SubFolders.Count,
-                NotesCount = input.Notes.Count,
+                ParentFolderId = input.ParentFolderId,
+                NotesCount = counts?.NotesCount ?? 0,
+                SubFoldersCount = counts?.SubFolderCount ?? 0,
             };
         }
     }

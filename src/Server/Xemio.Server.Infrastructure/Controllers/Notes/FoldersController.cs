@@ -1,20 +1,16 @@
 ﻿using EnsureThat;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using NSwag.Annotations;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Raven.Client;
 using Xemio.Server.Contracts.Mapping;
-using Xemio.Server.Infrastructure.Database;
+using Xemio.Server.Infrastructure.Database.Indexes;
 using Xemio.Server.Infrastructure.Entities.Notes;
-using Xemio.Server.Infrastructure.Extensions;
 using Xemio.Shared.Models.Notes;
 
 namespace Xemio.Server.Infrastructure.Controllers.Notes
@@ -33,26 +29,24 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             public const string DeleteFolder = nameof(DeleteFolder);
         }
 
-        private readonly XemioContext _xemioContext;
+        private readonly IAsyncDocumentSession _documentSession;
         private readonly IMapper<Folder, FolderDTO> _folderToFolderDTOMapper;
 
-        public FoldersController(XemioContext xemioContext, IMapper<Folder, FolderDTO> folderToFolderDTOMapper)
+        public FoldersController(IAsyncDocumentSession documentSession, IMapper<Folder, FolderDTO> folderToFolderDTOMapper)
         {
-            EnsureArg.IsNotNull(xemioContext, nameof(xemioContext));
+            EnsureArg.IsNotNull(documentSession, nameof(documentSession));
             EnsureArg.IsNotNull(folderToFolderDTOMapper, nameof(folderToFolderDTOMapper));
 
-            this._xemioContext = xemioContext;
+            this._documentSession = documentSession;
             this._folderToFolderDTOMapper = folderToFolderDTOMapper;
         }
-        
+
         [HttpGet(Name = RouteNames.GetRootFolders)]
-        [Description("Get all root folders.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(IList<FolderDTO>), Description = "All root folders.")]
-        public async Task<IActionResult> GetRootFoldersAsync()
+        public async Task<IActionResult> GetRootFoldersAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var folders = await this._xemioContext.Folders
-                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolder == null)
-                .ToListAsync();
+            var folders = await this._documentSession.Query<Folder, Folders_ForQuery>()
+                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == null)
+                .ToListAsync(cancellationToken);
 
             var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
 
@@ -60,19 +54,16 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpGet("{folderId:guid}/folders", Name = RouteNames.GetSubFolders)]
-        [Description("Get all sub folders from the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(IList<FolderDTO>), Description = "All sub folders.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        public async Task<IActionResult> GetSubFoldersAsync([Required]Guid? folderId)
+        public async Task<IActionResult> GetSubFoldersAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var folder = await this._xemioContext.FindAsync<Folder>(folderId);
+            var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null)
                 return this.NotFound();
 
-            var folders = await this._xemioContext.Folders
-                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolder.Id == folderId)
-                .ToListAsync();
+            var folders = await this._documentSession.Query<Folder, Folders_ForQuery>()
+                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folderId)
+                .ToListAsync(cancellationToken);
 
             var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
 
@@ -80,38 +71,34 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpGet("{folderId:guid}", Name = RouteNames.GetFolderById)]
-        [Description("Get the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(FolderDTO), Description = "The folder.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        public async Task<IActionResult> GetFolderAsync([Required]Guid? folderId)
+        public async Task<IActionResult> GetFolderAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var folder = await this._xemioContext.FindAsync<Folder>(folderId);
+            var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
-            
+
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
             return this.Ok(folderDTO);
         }
-        
+
         [HttpPost(Name = RouteNames.CreateFolder)]
-        [Description("Create a new folder.")]
-        [SwaggerResponse(StatusCodes.Status201Created, typeof(FolderDTO), Description = "The folder was created.")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, typeof(void), Description = "Some parameters are incorrect.")]
-        public async Task<IActionResult> PostFolderAsync([FromBody][Required]CreateFolder data)
+        public async Task<IActionResult> CreateFolderAsync([FromBody][Required]CreateFolder data, CancellationToken cancellationToken = default(CancellationToken))
         {
+            var parentFolder = data.ParentFolderId != null
+                ? await this._documentSession.LoadAsync<Folder>(data.ParentFolderId.Value, cancellationToken)
+                : null;
+
             var folder = new Folder
             {
                 Name = data.Name,
-                ParentFolder = data.ParentFolderId != null 
-                    ? await this._xemioContext.FindAsync<Folder>(data.ParentFolderId.Value) 
-                    : null,
+                ParentFolderId = parentFolder?.Id,
                 UserId = this.User.Identity.Name
             };
 
-            await this._xemioContext.AddAsync(folder);
-            await this._xemioContext.SaveChangesAsync();
+            await this._documentSession.StoreAsync(folder, cancellationToken);
+            await this._documentSession.SaveChangesAsync(cancellationToken);
 
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
@@ -119,21 +106,13 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpPatch("{folderId:guid}", Name = RouteNames.UpdateFolder)]
-        [Description("Update the specified folder.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(FolderDTO), Description = "The folder was updated.")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, typeof(void), Description = "Some parameters are incorrect")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
-        public async Task<IActionResult> PatchFolderAsync([Required]Guid? folderId, [FromBody][Required]JObject data, [FromQuery]byte[] etag = null)
+        public async Task<IActionResult> UpdateFolderAsync([Required]Guid? folderId, [FromBody][Required]JObject data, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var folder = await this._xemioContext.FindAsync<Folder>(folderId);
+            var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
             
-            if (etag != null)
-                this._xemioContext.Entry(folder).ETagForConcurrencyControlIs(etag);
-
             if (data.TryGetValue(nameof(FolderDTO.Name), StringComparison.OrdinalIgnoreCase, out var nameToken))
             {
                 var name = nameToken.ToObject<string>();
@@ -142,26 +121,22 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
             if (data.TryGetValue(nameof(FolderDTO.ParentFolderId), StringComparison.OrdinalIgnoreCase, out var parentFolderIdToken))
             {
-                await this._xemioContext.Entry(folder)
-                    .Reference(f => f.ParentFolder)
-                    .LoadAsync();
-
                 var parentFolderId = parentFolderIdToken.ToObject<Guid?>();
 
                 if (parentFolderId == null)
                 {
-                    folder.ParentFolder = null;
+                    folder.ParentFolderId = null;
                 }
                 else
                 {
-                    var parentFolder = await this._xemioContext.FindAsync<Folder>(parentFolderId.Value);
+                    var parentFolder = await this._documentSession.LoadAsync<Folder>(parentFolderId.Value, cancellationToken);
 
                     if (parentFolder != null)
-                        folder.ParentFolder = parentFolder;
+                        folder.ParentFolderId = parentFolder.Id;
                 }
             }
-
-            await this._xemioContext.SaveChangesAsync();
+            
+            await this._documentSession.SaveChangesAsync(cancellationToken);
 
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
@@ -169,23 +144,15 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpDelete("{folderId:guid}", Name = RouteNames.DeleteFolder)]
-        [Description("Delete the specified folder and all subfolders.")]
-        [SwaggerResponse(StatusCodes.Status200OK, typeof(void), Description = "The folder was deleted.")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, typeof(void), Description = "The folder does not exist.")]
-        [SwaggerResponse(StatusCodes.Status409Conflict, typeof(void), Description = "The folder was changed in the meantime.")]
-        public async Task<IActionResult> DeleteFolderAsync([Required]Guid? folderId, [FromQuery]byte[] etag = null)
+        public async Task<IActionResult> DeleteFolderAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Folder folder = await this._xemioContext.FindAsync<Folder>(folderId);
+            Folder folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
-
-            if (etag != null)
-                this._xemioContext.Entry(folder).ETagForConcurrencyControlIs(etag);
-                
-            this._xemioContext.Remove(folder);
-
-            await this._xemioContext.SaveChangesAsync();
+            
+            this._documentSession.Delete(folder);
+            await this._documentSession.SaveChangesAsync(cancellationToken);
 
             return this.Ok();
         }

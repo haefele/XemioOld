@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NJsonSchema;
-using NSwag.AspNetCore;
-using NSwag.CodeGeneration.SwaggerGenerators.WebApi.Processors.Security;
 using System.Reflection;
 using FluentValidation.AspNetCore;
 using Xemio.Hosts.AspNetCore.Setup;
@@ -39,7 +36,6 @@ namespace Xemio.Hosts.AspNetCore
             services
                 .AddMvc(f =>
                     {
-                        f.Filters.Add(typeof(ConcurrencyExceptionFilterAttribute));
                         f.Filters.Add(typeof(RequiredParameterFilterAttribute));
                         f.Filters.Add(typeof(ValidModelStateFilterAttribute));
                     })
@@ -55,24 +51,6 @@ namespace Xemio.Hosts.AspNetCore
             
             app.UseCors(f => f.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseAuth0Authentication(this.Configuration.GetSection("Auth0"));
-            app.UseSwaggerUi(typeof(FoldersController).GetTypeInfo().Assembly, new SwaggerUiOwinSettings
-            {
-                Title = "Xemio HTTP API",
-                Description = "All available HTTP endpoints for the xemio API.",
-                DefaultPropertyNameHandling = PropertyNameHandling.CamelCase,
-                SwaggerRoute = "/swagger/swagger.json",
-                SwaggerUiRoute = "/swagger",
-                DocumentProcessors =
-                {
-                    new SecurityDefinitionAppender("Authorization", new NSwag.SwaggerSecurityScheme
-                    {
-                        Type = NSwag.SwaggerSecuritySchemeType.ApiKey,
-                        Name = "Authorization",
-                        In = NSwag.SwaggerSecurityApiKeyLocation.Header,
-                        Description = "Use the id_token from Auth0 as a bearer token."
-                    }),
-                }
-            });
             app.UseMvc();
         }
     }

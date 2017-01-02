@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Xemio.Server.Infrastructure.Database;
+using Raven.Client;
+using Raven.Client.Document;
+using Raven.Client.Indexes;
+using Xemio.Server.Infrastructure.Entities.Notes;
 
 namespace Xemio.Hosts.AspNetCore.Setup
 {
@@ -11,14 +14,26 @@ namespace Xemio.Hosts.AspNetCore.Setup
     {
         public static void AddDatabase(this IServiceCollection self, IConfiguration configuration)
         {
-            var connectionString = configuration.GetValue<string>("ConnectionString");
-            self.AddDbContext<XemioContext>(options => options.UseSqlServer(connectionString));
+            var documentStore = new DocumentStore();
+            documentStore.ParseConnectionString(configuration.GetValue<string>("ConnectionString"));
+
+            documentStore.Initialize();
+
+            self.AddSingleton<IDocumentStore>(documentStore);
+            self.AddScoped<IAsyncDocumentSession>((sp) =>
+            {
+                var session = sp.GetService<IDocumentStore>().OpenAsyncSession();
+
+                session.Advanced.WaitForIndexesAfterSaveChanges();
+
+                return session;
+            });
         }
 
         public static void MigrateDatabase(this IApplicationBuilder self)
         {
-            var context = self.ApplicationServices.GetService<XemioContext>();
-            context.Database.Migrate();
+            var documentStore = self.ApplicationServices.GetService<IDocumentStore>();
+            IndexCreation.CreateIndexes(typeof(Folder).GetTypeInfo().Assembly, documentStore);
         }
     }
 }

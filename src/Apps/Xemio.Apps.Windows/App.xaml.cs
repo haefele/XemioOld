@@ -12,6 +12,7 @@ using Xemio.Apps.Windows.ShellModes;
 using Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy;
 using Xemio.Apps.Windows.Views.Login;
 using Xemio.Apps.Windows.Views.Notes;
+using Xemio.Client.Errors;
 
 namespace Xemio.Apps.Windows
 {
@@ -30,7 +31,7 @@ namespace Xemio.Apps.Windows
 
         public override string GetErrorMessage() => "An error occured.";
 
-        public override Type GetCommonExceptionType() => typeof(Exception);
+        public override Type GetCommonExceptionType() => typeof(XemioException);
 
         public override IEnumerable<Type> GetServiceTypes()
         {

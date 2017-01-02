@@ -13,7 +13,7 @@ namespace Xemio.Apps.Windows.Services.Auth
     public class AuthService : IAuthService
     {
         private const string Domain = "haefele.eu.auth0.com";
-        private const string ClientId = "";
+        private const string ClientId = "TtPzHCk2Q4683MfM0ECxHdwA264cH28s";
         private const string CallbackUrl = "https://" + Domain + "/mobile";
         private const string AuthorizeUrl = "https://" + Domain + "/authorize";
         private const string DelegationUrl = "https://" + Domain + "/delegation";
@@ -89,11 +89,14 @@ namespace Xemio.Apps.Windows.Services.Auth
             var response = await new HttpClient().GetAsync(UserInfoUrl + QueryString.Build(query));
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            var responseJson = JObject.Parse(responseContent);
-            user.Email = responseJson.Value<string>("email");
-            user.EmailVerified = responseJson.Value<bool>("email_verified");
-            user.FirstName = responseJson.Value<string>("given_name");
-            user.LastName = responseJson.Value<string>("family_name");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseJson = JObject.Parse(responseContent);
+                user.Email = responseJson.Value<string>("email");
+                user.EmailVerified = responseJson.Value<bool>("email_verified");
+                user.FirstName = responseJson.Value<string>("given_name");
+                user.LastName = responseJson.Value<string>("family_name");
+            }
         }
 
         private string NewState()

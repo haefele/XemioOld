@@ -37,24 +37,14 @@ namespace Xemio.Client.Notes
             return base.PostAsync<FolderDTO>("notes/folders", data, cancellationToken, HttpStatusCode.Created);
         }
 
-        public Task<FolderDTO> UpdateFolderAsync(Guid folderId, JObject changes, byte[] etag = null, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<FolderDTO> UpdateFolderAsync(Guid folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var query = new Dictionary<string, string>();
-
-            if (etag != null)
-                query["etag"] = Convert.ToBase64String(etag);
-
-            return base.PatchAsync<FolderDTO>($"notes/folders/{folderId:D}", query, changes, cancellationToken, HttpStatusCode.OK);
+            return base.PatchAsync<FolderDTO>($"notes/folders/{folderId:D}", changes, cancellationToken, HttpStatusCode.OK);
         }
 
-        public Task DeleteFolderAsync(Guid folderId, byte[] etag = null, CancellationToken cancellationToken = default(CancellationToken))
+        public Task DeleteFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var query = new Dictionary<string, string>();
-
-            if (etag != null)
-                query["etag"] = Convert.ToBase64String(etag);
-
-            return base.DeleteAsync<object>($"notes/folders/{folderId:D}", query, null, cancellationToken, HttpStatusCode.OK);
+            return base.DeleteAsync<object>($"notes/folders/{folderId:D}", null, cancellationToken, HttpStatusCode.OK);
         }
     }
 }

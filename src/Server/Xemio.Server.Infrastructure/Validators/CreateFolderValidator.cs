@@ -14,9 +14,6 @@ namespace Xemio.Server.Infrastructure.Validators
                 .NotNull()
                 .NotEmpty()
                 .Length(1, 200);
-
-            this.RuleFor(f => f.ParentFolderId)
-                .NotEqual(default(Guid));
         }
     }
 }

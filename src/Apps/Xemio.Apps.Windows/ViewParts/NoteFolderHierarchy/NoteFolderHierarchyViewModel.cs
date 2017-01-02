@@ -91,7 +91,7 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
             }
             else
             {
-
+                //TODO: Show note
             }
         }
 

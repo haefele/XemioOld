@@ -22,7 +22,7 @@ class Program
             {
                 Name = "Hoi",
                 ParentFolderId = (Guid?)null
-            }), null, CancellationToken.None).Result;
+            }), CancellationToken.None).Result;
         }
     }
 }

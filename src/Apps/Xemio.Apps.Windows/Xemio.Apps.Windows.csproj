@@ -95,6 +95,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Errors\NoLongerLoggedInException.cs" />
     <Compile Include="Services\Auth\User.cs" />
     <Compile Include="ShellModes\LoggedInShellMode.cs" />
     <Compile Include="ShellModes\LoggedOutShellMode.cs" />
