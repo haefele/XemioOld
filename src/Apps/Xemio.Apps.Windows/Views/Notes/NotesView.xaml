@@ -17,6 +17,7 @@
         <ContentControl Grid.Row="0" 
                         micro:View.Model="{Binding NoteFolderHierarchyViewModel}" />
 
+        <Button Content="Do it" Command="{x:Bind ViewModel.CreateFolder}" />
 
         <CommandBar Grid.Row="1">
             <AppBarButton Icon="Add"

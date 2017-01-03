@@ -18,10 +18,10 @@ class Program
 
             var client = new FoldersClient(bearerToken);
 
-            var rootFoldes = client.UpdateFolderAsync(Guid.Parse("DE3750F4-2B9C-422D-21EE-08D429D84950"), JObject.FromObject(new
+            var rootFoldes = client.UpdateFolderAsync(1, JObject.FromObject(new
             {
                 Name = "Hoi",
-                ParentFolderId = (Guid?)null
+                ParentFolderId = (long?)null
             }), CancellationToken.None).Result;
         }
     }

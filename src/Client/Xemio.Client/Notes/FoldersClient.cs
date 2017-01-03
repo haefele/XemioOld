@@ -22,14 +22,14 @@ namespace Xemio.Client.Notes
             return base.GetAsync<IList<FolderDTO>>("notes/folders", cancellationToken, HttpStatusCode.OK);
         }
 
-        public Task<IList<FolderDTO>> GetSubFoldersAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IList<FolderDTO>> GetSubFoldersAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return base.GetAsync<IList<FolderDTO>>($"notes/folders/{folderId:D}/folders", cancellationToken, HttpStatusCode.OK);
+            return base.GetAsync<IList<FolderDTO>>($"notes/folders/{folderId}/folders", cancellationToken, HttpStatusCode.OK);
         }
 
-        public Task<FolderDTO> GetFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<FolderDTO> GetFolderAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return base.GetAsync<FolderDTO>($"notes/folders/{folderId:D}", cancellationToken, HttpStatusCode.OK);
+            return base.GetAsync<FolderDTO>($"notes/folders/{folderId}", cancellationToken, HttpStatusCode.OK);
         }
 
         public Task<FolderDTO> CreateFolderAsync(CreateFolder data, CancellationToken cancellationToken = default(CancellationToken))
@@ -37,14 +37,14 @@ namespace Xemio.Client.Notes
             return base.PostAsync<FolderDTO>("notes/folders", data, cancellationToken, HttpStatusCode.Created);
         }
 
-        public Task<FolderDTO> UpdateFolderAsync(Guid folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<FolderDTO> UpdateFolderAsync(long folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return base.PatchAsync<FolderDTO>($"notes/folders/{folderId:D}", changes, cancellationToken, HttpStatusCode.OK);
+            return base.PatchAsync<FolderDTO>($"notes/folders/{folderId}", changes, cancellationToken, HttpStatusCode.OK);
         }
 
-        public Task DeleteFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken))
+        public Task DeleteFolderAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return base.DeleteAsync<object>($"notes/folders/{folderId:D}", null, cancellationToken, HttpStatusCode.OK);
+            return base.DeleteAsync<object>($"notes/folders/{folderId}", null, cancellationToken, HttpStatusCode.OK);
         }
     }
 }

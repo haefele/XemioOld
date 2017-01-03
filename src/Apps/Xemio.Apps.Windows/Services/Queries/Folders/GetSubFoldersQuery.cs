@@ -11,9 +11,9 @@ namespace Xemio.Apps.Windows.Services.Queries.Folders
 {
     public class GetSubFoldersQuery : IQuery<IList<FolderDTO>>, IEquatable<GetSubFoldersQuery>
     {
-        public Guid FolderId { get; }
+        public long FolderId { get; }
 
-        public GetSubFoldersQuery(Guid folderId)
+        public GetSubFoldersQuery(long folderId)
         {
             this.FolderId = folderId;
         }

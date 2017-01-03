@@ -10,10 +10,10 @@ namespace Xemio.Client.Notes
     public interface IFoldersClient
     {
         Task<FolderDTO> CreateFolderAsync(CreateFolder data, CancellationToken cancellationToken = default(CancellationToken));
-        Task DeleteFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken));
-        Task<FolderDTO> GetFolderAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken));
+        Task DeleteFolderAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<FolderDTO> GetFolderAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken));
         Task<IList<FolderDTO>> GetRootFoldersAsync(CancellationToken cancellationToken = default(CancellationToken));
-        Task<IList<FolderDTO>> GetSubFoldersAsync(Guid folderId, CancellationToken cancellationToken = default(CancellationToken));
-        Task<FolderDTO> UpdateFolderAsync(Guid folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IList<FolderDTO>> GetSubFoldersAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<FolderDTO> UpdateFolderAsync(long folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

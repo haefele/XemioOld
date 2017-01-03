@@ -9,7 +9,7 @@ namespace Xemio.Server.Infrastructure.Database.Indexes
     {
         public class Result
         {
-            public Guid FolderId { get; set; }
+            public string FolderId { get; set; }
             public int SubFolderCount { get; set; }
             public int NotesCount { get; set; }
         }

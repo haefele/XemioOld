@@ -53,8 +53,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             return this.Ok(folderDTOs);
         }
 
-        [HttpGet("{folderId:guid}/folders", Name = RouteNames.GetSubFolders)]
-        public async Task<IActionResult> GetSubFoldersAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
+        [HttpGet("{folderId:long}/folders", Name = RouteNames.GetSubFolders)]
+        public async Task<IActionResult> GetSubFoldersAsync([Required]long? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
@@ -62,7 +62,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
                 return this.NotFound();
 
             var folders = await this._documentSession.Query<Folder, Folders_ForQuery>()
-                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folderId)
+                .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folder.Id)
                 .ToListAsync(cancellationToken);
 
             var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
@@ -70,8 +70,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             return this.Ok(folderDTOs);
         }
 
-        [HttpGet("{folderId:guid}", Name = RouteNames.GetFolderById)]
-        public async Task<IActionResult> GetFolderAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
+        [HttpGet("{folderId:long}", Name = RouteNames.GetFolderById)]
+        public async Task<IActionResult> GetFolderAsync([Required]long? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
@@ -102,11 +102,11 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
 
-            return this.CreatedAtRoute(RouteNames.GetFolderById, new { folderId = folder.Id }, folderDTO);
+            return this.CreatedAtRoute(RouteNames.GetFolderById, new { folderId = folderDTO.Id }, folderDTO);
         }
 
-        [HttpPatch("{folderId:guid}", Name = RouteNames.UpdateFolder)]
-        public async Task<IActionResult> UpdateFolderAsync([Required]Guid? folderId, [FromBody][Required]JObject data, CancellationToken cancellationToken = default(CancellationToken))
+        [HttpPatch("{folderId:long}", Name = RouteNames.UpdateFolder)]
+        public async Task<IActionResult> UpdateFolderAsync([Required]long? folderId, [FromBody][Required]JObject data, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
@@ -121,7 +121,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
 
             if (data.TryGetValue(nameof(FolderDTO.ParentFolderId), StringComparison.OrdinalIgnoreCase, out var parentFolderIdToken))
             {
-                var parentFolderId = parentFolderIdToken.ToObject<Guid?>();
+                var parentFolderId = parentFolderIdToken.ToObject<long?>();
 
                 if (parentFolderId == null)
                 {
@@ -143,8 +143,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             return this.Ok(folderDTO);
         }
 
-        [HttpDelete("{folderId:guid}", Name = RouteNames.DeleteFolder)]
-        public async Task<IActionResult> DeleteFolderAsync([Required]Guid? folderId, CancellationToken cancellationToken = default(CancellationToken))
+        [HttpDelete("{folderId:long}", Name = RouteNames.DeleteFolder)]
+        public async Task<IActionResult> DeleteFolderAsync([Required]long? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Folder folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 

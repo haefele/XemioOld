@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Abstractions.Data;
-using Raven.Client;
+using Xemio.Server.Infrastructure.Entities;
 
 namespace Xemio.Server.Infrastructure.Extensions
 {
