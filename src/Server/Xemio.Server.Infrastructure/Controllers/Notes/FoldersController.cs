@@ -1,8 +1,6 @@
 ﻿using EnsureThat;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
@@ -106,36 +104,33 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpPatch("{folderId:long}", Name = RouteNames.UpdateFolder)]
-        public async Task<IActionResult> UpdateFolderAsync([Required]long? folderId, [FromBody][Required]JObject data, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> UpdateFolderAsync([Required]long? folderId, [FromBody][Required]UpdateFolder data, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
-            
-            if (data.TryGetValue(nameof(FolderDTO.Name), StringComparison.OrdinalIgnoreCase, out var nameToken))
+
+            if (data.HasName())
             {
-                var name = nameToken.ToObject<string>();
-                folder.Name = name;
+                folder.Name = data.Name;
             }
 
-            if (data.TryGetValue(nameof(FolderDTO.ParentFolderId), StringComparison.OrdinalIgnoreCase, out var parentFolderIdToken))
+            if (data.HasParentFolderId())
             {
-                var parentFolderId = parentFolderIdToken.ToObject<long?>();
-
-                if (parentFolderId == null)
+                if (data.ParentFolderId == null)
                 {
                     folder.ParentFolderId = null;
                 }
                 else
                 {
-                    var parentFolder = await this._documentSession.LoadAsync<Folder>(parentFolderId.Value, cancellationToken);
+                    var parentFolder = await this._documentSession.LoadAsync<Folder>(data.ParentFolderId.Value, cancellationToken);
 
-                    if (parentFolder != null)
+                    if (parentFolder != null && parentFolder.UserId == this.User.Identity.Name)
                         folder.ParentFolderId = parentFolder.Id;
                 }
             }
-            
+
             await this._documentSession.SaveChangesAsync(cancellationToken);
 
             var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder, cancellationToken);

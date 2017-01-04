@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
+using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.Options;
 using Xemio.Hosts.AspNetCore.Setup;
-using Xemio.Server.Infrastructure.Controllers.Notes;
 using Xemio.Server.Infrastructure.Filters;
+using Xemio.Server.Infrastructure.Json;
 using Xemio.Server.Infrastructure.Validators;
 
 namespace Xemio.Hosts.AspNetCore
@@ -39,7 +43,21 @@ namespace Xemio.Hosts.AspNetCore
                         f.Filters.Add(typeof(RequiredParameterFilterAttribute));
                         f.Filters.Add(typeof(ValidModelStateFilterAttribute));
                     })
-                .AddFluentValidation(f => f.RegisterValidatorsFromAssemblyContaining<CreateFolderValidator>());
+                .AddJsonOptions(f =>
+                {
+                    f.SerializerSettings.Converters.Add(new JObjectSubClassConverter());
+                })
+                .AddFluentValidation(f =>
+                {
+                    f.RegisterValidatorsFromAssemblyContaining<CreateFolderValidator>();
+                });
+
+            services.Add(ServiceDescriptor.Singleton<IObjectModelValidator, FixedFluentValidationObjectModelValidator>(s =>
+            {
+                var options = s.GetRequiredService<IOptions<MvcOptions>>().Value;
+                var metadataProvider = s.GetRequiredService<IModelMetadataProvider>();
+                return new FixedFluentValidationObjectModelValidator(metadataProvider, options.ModelValidatorProviders, s.GetRequiredService<IValidatorFactory>());
+            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

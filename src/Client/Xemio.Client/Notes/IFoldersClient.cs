@@ -14,6 +14,6 @@ namespace Xemio.Client.Notes
         Task<FolderDTO> GetFolderAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken));
         Task<IList<FolderDTO>> GetRootFoldersAsync(CancellationToken cancellationToken = default(CancellationToken));
         Task<IList<FolderDTO>> GetSubFoldersAsync(long folderId, CancellationToken cancellationToken = default(CancellationToken));
-        Task<FolderDTO> UpdateFolderAsync(long folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken));
+        Task<FolderDTO> UpdateFolderAsync(long folderId, UpdateFolder changes, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -37,7 +37,7 @@ namespace Xemio.Client.Notes
             return base.PostAsync<FolderDTO>("notes/folders", data, cancellationToken, HttpStatusCode.Created);
         }
 
-        public Task<FolderDTO> UpdateFolderAsync(long folderId, JObject changes, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<FolderDTO> UpdateFolderAsync(long folderId, UpdateFolder changes, CancellationToken cancellationToken = default(CancellationToken))
         {
             return base.PatchAsync<FolderDTO>($"notes/folders/{folderId}", changes, cancellationToken, HttpStatusCode.OK);
         }

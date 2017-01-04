@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Xemio.Shared.Models.Notes
+﻿namespace Xemio.Shared.Models.Notes
 {
     public class CreateFolder
     {
