@@ -149,13 +149,13 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Client\Xemio.Client\Xemio.Client.csproj">
-      <Project>{1b1667ca-a9a9-4c8c-a0f4-6e30e0f66d41}</Project>
-      <Name>Xemio.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Shared\Xemio.Shared\Xemio.Shared.csproj">
       <Project>{524ec1e1-3949-47a2-ab69-2a125660e06b}</Project>
       <Name>Xemio.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xemio.Client\Xemio.Client.csproj">
+      <Project>{1b1667ca-a9a9-4c8c-a0f4-6e30e0f66d41}</Project>
+      <Name>Xemio.Client</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.NETCore.App" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Client\Xemio.Client\Xemio.Client.csproj" />
+    <ProjectReference Include="..\..\Apps\Xemio.Client\Xemio.Client.csproj" />
     <ProjectReference Include="..\..\Shared\Xemio.Shared\Xemio.Shared.csproj" />
   </ItemGroup>
 </Project>
