@@ -6,6 +6,6 @@ namespace Xemio.Shared.Models.Notes
     {
         public string Title { get; set; }
         public string Content { get; set; }
-        public Guid? FolderId { get; set; }
+        public long? FolderId { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
                 .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == null)
                 .ToListAsync(cancellationToken);
 
-            var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
+            var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders, cancellationToken);
 
             return this.Ok(folderDTOs);
         }
@@ -58,27 +58,27 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
-            if (folder == null)
+            if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
 
             var folders = await this._documentSession.Query<Folder, Folders_ForQuery>()
                 .Where(f => f.UserId == this.User.Identity.Name && f.ParentFolderId == folder.Id)
                 .ToListAsync(cancellationToken);
 
-            var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders);
+            var folderDTOs = await this._folderToFolderDTOMapper.MapListAsync(folders, cancellationToken);
 
             return this.Ok(folderDTOs);
         }
 
         [HttpGet("{folderId:long}", Name = RouteNames.GetFolderById)]
-        public async Task<IActionResult> GetFolderAsync([Required]long? folderId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> GetFolderByIdAsync([Required]long? folderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(folderId, cancellationToken);
 
             if (folder == null || folder.UserId != this.User.Identity.Name)
                 return this.NotFound();
 
-            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder, cancellationToken);
 
             return this.Ok(folderDTO);
         }
@@ -100,7 +100,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             await this._documentSession.StoreAsync(folder, cancellationToken);
             await this._documentSession.SaveChangesAsync(cancellationToken);
 
-            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder, cancellationToken);
 
             return this.CreatedAtRoute(RouteNames.GetFolderById, new { folderId = folderDTO.Id }, folderDTO);
         }
@@ -138,7 +138,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             
             await this._documentSession.SaveChangesAsync(cancellationToken);
 
-            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder);
+            var folderDTO = await this._folderToFolderDTOMapper.MapAsync(folder, cancellationToken);
 
             return this.Ok(folderDTO);
         }

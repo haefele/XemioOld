@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Xemio.Shared.Models.Notes;
 using Xemio.Server.Contracts.Mapping;
 using System.Threading.Tasks;
@@ -21,36 +22,35 @@ namespace Xemio.Server.Infrastructure.Mapping
             this._documentSession = documentSession;
         }
 
-        public override async Task<FolderDTO> MapAsync(Folder input)
+        public override async Task<FolderDTO> MapAsync(Folder input, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (input == null)
                 return null;
 
             var counts = await this._documentSession.Query<Folders_ByChildrenCount.Result, Folders_ByChildrenCount>()
                 .Where(f => f.FolderId == input.Id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             return this.ToFolderDTO(input, counts);
         }
 
-        public override async Task<IList<FolderDTO>> MapListAsync(IList<Folder> input)
+        public override async Task<IList<FolderDTO>> MapListAsync(IList<Folder> input, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var folderIds = input.Where(f => f != null).Select(f => f.Id).ToList();
+            var folderIds = input.Where(f => f != null).Select(f => f.Id).Distinct().ToList();
 
             var counts = await this._documentSession.Query<Folders_ByChildrenCount.Result, Folders_ByChildrenCount>()
                 .Where(f => f.FolderId.In(folderIds))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return input
-                .Select(f => this.ToFolderDTO(f, counts.FirstOrDefault(d => d.FolderId == f.Id)))
+                .Select(f => f == null 
+                    ? null 
+                    : this.ToFolderDTO(f, counts.FirstOrDefault(d => d.FolderId == f.Id)))
                 .ToList();
         }
 
         private FolderDTO ToFolderDTO(Folder folder, Folders_ByChildrenCount.Result counts)
         {
-            if (folder == null)
-                return null;
-            
             return new FolderDTO
             {
                 Id = this._documentSession.ToLongId(folder.Id),
