@@ -9,7 +9,6 @@ namespace Xemio.Shared.Models.Notes
         {
             return this.TryGetValue(nameof(FolderDTO.Name), StringComparison.OrdinalIgnoreCase, out var _);
         }
-
         public string Name
         {
             get
@@ -22,13 +21,11 @@ namespace Xemio.Shared.Models.Notes
                 this[nameof(FolderDTO.Name)] = value;
             }
         }
-
-
+        
         public bool HasParentFolderId()
         {
             return this.TryGetValue(nameof(FolderDTO.ParentFolderId), StringComparison.OrdinalIgnoreCase, out var _);
         }
-
         public long? ParentFolderId
         {
             get

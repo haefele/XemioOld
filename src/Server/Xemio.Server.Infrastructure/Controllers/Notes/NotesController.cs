@@ -24,6 +24,8 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             public const string CreateNote = nameof(CreateNote);
             public const string GetNoteById = nameof(GetNoteById);
             public const string GetNotesFromFolder = nameof(GetNotesFromFolder);
+            public const string UpdateNote = nameof(UpdateNote);
+            public const string DeleteNote = nameof(DeleteNote);
         }
 
         private readonly IAsyncDocumentSession _documentSession;
@@ -47,6 +49,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
                 return this.NotFound();
 
             var noteDTO = await this._noteToNoteDTOMapper.MapAsync(note, cancellationToken);
+
             return this.Ok(noteDTO);
         }
 
@@ -68,7 +71,7 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
         }
 
         [HttpPost(Name = RouteNames.CreateNote)]
-        public async Task<IActionResult> PostNoteAsync([FromBody][Required]CreateNote createNote, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> CreateNoteAsync([FromBody][Required]CreateNote createNote, CancellationToken cancellationToken = default(CancellationToken))
         {
             var folder = await this._documentSession.LoadAsync<Folder>(createNote.FolderId, cancellationToken);
 
@@ -87,7 +90,55 @@ namespace Xemio.Server.Infrastructure.Controllers.Notes
             await this._documentSession.SaveChangesAsync(cancellationToken);
 
             var noteDTO = await this._noteToNoteDTOMapper.MapAsync(note, cancellationToken);
+
             return this.CreatedAtRoute(RouteNames.GetNoteById, new { noteId = note.Id }, noteDTO);
+        }
+
+        [HttpPatch("{noteId:long}", Name = RouteNames.UpdateNote)]
+        public async Task<IActionResult> UpdateNoteAsync([Required] long? noteId, [FromBody][Required]UpdateNote data, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var note = await this._documentSession.LoadAsync<Note>(noteId, cancellationToken);
+
+            if (note == null || note.UserId != this.User.Identity.Name)
+                return this.NotFound();
+
+            if (data.HasTitle())
+            {
+                note.Title = data.Title;
+            }
+
+            if (data.HasContent())
+            {
+                note.Content = data.Content;
+            }
+
+            if (data.HasFolderId())
+            {
+                var folder = await this._documentSession.LoadAsync<Folder>(data.FolderId, cancellationToken);
+
+                if (folder != null && folder.UserId == this.User.Identity.Name)
+                    note.FolderId = folder.Id;
+            }
+
+            await this._documentSession.SaveChangesAsync(cancellationToken);
+
+            var noteDTO = await this._noteToNoteDTOMapper.MapAsync(note, cancellationToken);
+
+            return this.Ok(noteDTO);
+        }
+
+        [HttpDelete("{noteId:long}", Name = RouteNames.DeleteNote)]
+        public async Task<IActionResult> DeleteNoteAsync([Required] long? noteId, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var note = await this._documentSession.LoadAsync<Note>(noteId, cancellationToken);
+
+            if (note == null || note.UserId != this.User.Identity.Name)
+                return this.NotFound();
+
+            this._documentSession.Delete(note);
+            await this._documentSession.SaveChangesAsync(cancellationToken);
+
+            return this.Ok();
         }
     }
 }
