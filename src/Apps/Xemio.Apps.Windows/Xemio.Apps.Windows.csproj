@@ -97,6 +97,11 @@
     </Compile>
     <Compile Include="Errors\NoLongerLoggedInException.cs" />
     <Compile Include="Services\Auth\User.cs" />
+    <Compile Include="Services\Commands\CommandQueue.cs" />
+    <Compile Include="Services\Commands\Folders\CreateFolderCommand.cs" />
+    <Compile Include="Services\Commands\ICommand.cs" />
+    <Compile Include="Services\Commands\ICommandHandler.cs" />
+    <Compile Include="Services\Commands\ICommandQueue.cs" />
     <Compile Include="ShellModes\LoggedInShellMode.cs" />
     <Compile Include="ShellModes\LoggedOutShellMode.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />

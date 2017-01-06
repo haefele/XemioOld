@@ -43,37 +43,25 @@ namespace Xemio.Apps.Windows.Services.Queries
 
             try
             {
+                //Execute query normally
                 var handlerType = typeof(IQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResult));
                 var handler = this._container.Resolve(handlerType);
                 var method = handler.GetType().GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.ExecuteAsync));
 
                 TResult result = await (Task<TResult>)method.Invoke(handler, new object[] { query });
 
+                //Cache query result
                 await this._queryCache.CacheQueryAsync(query, result);
 
                 return new QueryResult<TResult>(false, result);
             }
             catch (UnauthorizedException)
             {
-                var currentUser = this._applicationStateService.GetCurrentUser();
-
-                if (currentUser != null)
-                {
-                    await this._authService.RefreshUserAsync(currentUser);
-                    this._applicationStateService.SetCurrentUser(currentUser);
-
-                    this._container.UpdateClients(currentUser);
-
-                    return await this.ExecuteAsync(query);
-                }
-
-                //Automatically log the user out
-                this._shell.CurrentMode = IoC.Get<LoggedOutShellMode>();
-
-                throw new NoLongerLoggedInException("You are no longer logged in.");
+                return await this.OnUnauthorized(query);
             }
             catch
             {
+                //Try to get cached query result
                 TResult result;
                 if (await this._queryCache.TryGetCachedQueryAsync(query, out result))
                 {
@@ -82,6 +70,36 @@ namespace Xemio.Apps.Windows.Services.Queries
 
                 throw;
             }
+        }
+
+        private async Task<QueryResult<TResult>> OnUnauthorized<TResult>(IQuery<TResult> query)
+        {
+            QueryResult<TResult> Logout()
+            {
+                //Automatically log the user out
+                this._shell.CurrentMode = IoC.Get<LoggedOutShellMode>();
+                throw new NoLongerLoggedInException("You are no longer logged in.");
+            }
+
+            var currentUser = this._applicationStateService.GetCurrentUser();
+            if (currentUser != null)
+            {
+                try
+                {
+                    await this._authService.RefreshUserAsync(currentUser);
+                }
+                catch
+                {
+                    return Logout();
+                }
+
+                this._applicationStateService.SetCurrentUser(currentUser);
+                this._container.UpdateClients(currentUser);
+
+                return await this.ExecuteAsync(query);
+            }
+
+            return Logout();
         }
     }
 }
