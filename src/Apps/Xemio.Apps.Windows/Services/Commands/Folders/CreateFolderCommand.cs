@@ -9,7 +9,7 @@ namespace Xemio.Apps.Windows.Services.Commands.Folders
         public string Name { get; }
         public long? ParentFolderId { get; }
 
-        public CreateFolderCommand(string name, long? parentFolderId)
+        public CreateFolderCommand(string name, long? parentFolderId = null)
         {
             this.Name = name;
             this.ParentFolderId = parentFolderId;

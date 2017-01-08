@@ -14,13 +14,14 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40" />
+            <RowDefinition Height="44" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
     
         <ListView ItemsSource="{x:Bind ViewModel.ParentFolders, Mode=OneWay}"
-                  SelectedItem="{Binding SelectedParentFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectionChanged="ListView_OnSelectionChanged"
+                  SelectionMode="None"
+                  ItemClick="ParentFoldersListView_OnItemClick"
+                  IsItemClickEnabled="True"
                   Grid.Row="0">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -35,6 +36,7 @@
         </ListView>
         
         <GridView ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}" 
+                  SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemClick="ItemsListView_OnItemClick"
                   Grid.Row="1">
@@ -51,5 +53,6 @@
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
+        
     </Grid>
 </UserControl>

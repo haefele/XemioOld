@@ -18,8 +18,9 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
             await this.ViewModel.ShowSelectedItem.ExecuteAsync();
         }
         
-        private async void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ParentFoldersListView_OnItemClick(object sender, ItemClickEventArgs e)
         {
+            this.ViewModel.SelectedParentFolder = (FolderDTO) e.ClickedItem;
             await this.ViewModel.ShowSelectedParentFolder.ExecuteAsync();
         }
     }

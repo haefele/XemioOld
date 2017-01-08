@@ -1,9 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using UwCore;
+using Xemio.Apps.Windows.Services.Commands;
+using Xemio.Apps.Windows.Services.Commands.Folders;
 using Xemio.Apps.Windows.Services.Queries;
 using Xemio.Apps.Windows.Services.Queries.Folders;
 using Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy;
@@ -15,19 +18,19 @@ namespace Xemio.Apps.Windows.Views.Notes
     public class NotesViewModel : UwCoreScreen
     {
         private readonly IQueryExecutor _queryExecutor;
-        private readonly IFoldersClient _foldersClient;
+        private readonly ICommandQueue _commandQueue;
 
-        //public NoteFolderHierarchyViewModel NoteFolderHierarchyViewModel { get; }
+        public NoteFolderHierarchyViewModel NoteFolderHierarchyViewModel { get; }
 
         public UwCoreCommand<Unit> CreateFolder { get; }
 
-        public NotesViewModel(IQueryExecutor queryExecutor, IFoldersClient foldersClient)
+        public NotesViewModel(IQueryExecutor queryExecutor, ICommandQueue commandQueue)
         {
             this._queryExecutor = queryExecutor;
-            this._foldersClient = foldersClient;
+            this._commandQueue = commandQueue;
 
-            //this.NoteFolderHierarchyViewModel = IoC.Get<NoteFolderHierarchyViewModel>();
-            //this.NoteFolderHierarchyViewModel.ConductWith(this);
+            this.NoteFolderHierarchyViewModel = IoC.Get<NoteFolderHierarchyViewModel>();
+            this.NoteFolderHierarchyViewModel.ConductWith(this);
 
             this.CreateFolder = UwCoreCommand.Create(this.CreateFolderImpl)
                 .ShowLoadingOverlay("Oi")
@@ -36,12 +39,8 @@ namespace Xemio.Apps.Windows.Views.Notes
 
         private async Task CreateFolderImpl(CancellationToken arg)
         {
-            var folders = await this._queryExecutor.ExecuteAsync(new GetRootFoldersQuery());
-        }
-
-        protected override async void OnActivate()
-        {
-            base.OnActivate();
+            await this._commandQueue.EnqueueCommandAsync(new CreateFolderCommand("Neuer Ordner", this.NoteFolderHierarchyViewModel.CurrentFolder?.Id));
+            await this.NoteFolderHierarchyViewModel.Reload.ExecuteAsync();
         }
     }
 }

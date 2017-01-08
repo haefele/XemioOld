@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using UwCore;
@@ -17,11 +20,17 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
     {
         private readonly IQueryExecutor _queryExecutor;
 
+        private FolderDTO _currentFolder;
         private readonly ObservableCollection<FolderDTO> _parentFolders;
         private FolderDTO _selectedParentFolder;
         private readonly ObservableAsPropertyHelper<ObservableCollection<ItemViewModel>> _itemsHelper;
         private ItemViewModel _selectedItem;
 
+        public FolderDTO CurrentFolder
+        {
+            get { return this._currentFolder; }
+            private set { this.RaiseAndSetIfChanged(ref this._currentFolder, value); }
+        }
         public ReadOnlyObservableCollection<FolderDTO> ParentFolders { get; }
         public FolderDTO SelectedParentFolder
         {
@@ -46,6 +55,10 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
             this._queryExecutor = queryExecutor;
             
             this.ParentFolders = new ReadOnlyObservableCollection<FolderDTO>(this._parentFolders = new ObservableCollection<FolderDTO>());
+            ((INotifyCollectionChanged) this.ParentFolders).CollectionChanged += (s, e) =>
+            {
+                this.CurrentFolder = this.ParentFolders.LastOrDefault();
+            };
 
             this.Reload = UwCoreCommand
                 .Create(this.ReloadImpl)
@@ -55,12 +68,10 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
 
             this.ShowSelectedItem = UwCoreCommand
                 .Create(this.ShowSelectedItemImpl)
-                .ShowLoadingOverlay("Oi")
                 .HandleExceptions();
 
             this.ShowSelectedParentFolder = UwCoreCommand
                 .Create(this.ShowSelectedParentFolderImpl)
-                .ShowLoadingOverlay("Hoi")
                 .HandleExceptions();
         }
 
@@ -73,11 +84,12 @@ namespace Xemio.Apps.Windows.ViewParts.NoteFolderHierarchy
 
         private async Task<ObservableCollection<ItemViewModel>> ReloadImpl()
         {
-            var currentFolder = this.ParentFolders.LastOrDefault();
-
-            var folders = currentFolder != null 
-                ? await this._queryExecutor.ExecuteAsync(new GetSubFoldersQuery(currentFolder.Id)) 
+            var folders = this.CurrentFolder != null 
+                ? await this._queryExecutor.ExecuteAsync(new GetSubFoldersQuery(this.CurrentFolder.Id)) 
                 : await this._queryExecutor.ExecuteAsync(new GetRootFoldersQuery());
+
+            if (folders.IsStale)
+                Debugger.Break();
 
             return new ObservableCollection<ItemViewModel>(folders.Result.Select(f => new ItemViewModel(f)));
         }
